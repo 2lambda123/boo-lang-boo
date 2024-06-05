@@ -2,30 +2,30 @@
 // Copyright (c) 2003, 2004, 2005 Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
+//     * Redistributions in binary form must reproduce the above copyright
+//     notice, this list of conditions and the following disclaimer in the
+//     documentation and/or other materials provided with the distribution.
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 #endregion
-
 
 using System;
 using System.Collections.Generic;
@@ -33,271 +33,177 @@ using Boo.Lang.Compiler.TypeSystem.Core;
 using Boo.Lang.Compiler.TypeSystem.Services;
 using Boo.Lang.Compiler.Util;
 
-namespace Boo.Lang.Compiler.TypeSystem.Generics
-{
-public abstract class AbstractGenericParameter : IGenericParameter
-{
-    TypeSystemServices _tss;
+namespace Boo.Lang.Compiler.TypeSystem.Generics {
+public abstract class AbstractGenericParameter : IGenericParameter {
+  TypeSystemServices _tss;
 
-    protected AbstractGenericParameter(TypeSystemServices tss)
-    {
-        _tss = tss;
+  protected AbstractGenericParameter(TypeSystemServices tss) { _tss = tss; }
+
+  abstract public int GenericParameterPosition { get; }
+
+  abstract public bool MustHaveDefaultConstructor { get; }
+
+  abstract public Variance Variance { get; }
+
+  abstract public bool IsClass { get; }
+
+  abstract public bool IsValueType { get; }
+
+  abstract public IType[] GetTypeConstraints();
+
+  abstract public IEntity DeclaringEntity { get; }
+
+  protected IType DeclaringType {
+    get {
+      if (DeclaringEntity is IType)
+        return (IType)DeclaringEntity;
+      if (DeclaringEntity is IMethod)
+        return ((IMethod)DeclaringEntity).DeclaringType;
+      return null;
     }
+  }
 
-    abstract public int GenericParameterPosition {
-        get;
-    }
+  protected IMethod DeclaringMethod {
+    get { return DeclaringEntity as IMethod; }
+  }
 
-    abstract public bool MustHaveDefaultConstructor {
-        get;
-    }
+  bool IType.IsAbstract {
+    get { return false; }
+  }
 
-    abstract public Variance Variance {
-        get;
-    }
+  bool IType.IsInterface {
+    get { return false; }
+  }
 
-    abstract public bool IsClass {
-        get;
-    }
+  bool IType.IsEnum {
+    get { return false; }
+  }
 
-    abstract public bool IsValueType {
-        get;
-    }
+  public bool IsByRef {
+    get { return false; }
+  }
 
-    abstract public IType[] GetTypeConstraints();
+  bool IType.IsFinal {
+    get { return true; }
+  }
 
-    abstract public IEntity DeclaringEntity {
-        get;
-    }
+  bool IType.IsArray {
+    get { return false; }
+  }
 
-    protected IType DeclaringType
-    {
-        get
-        {
-            if (DeclaringEntity is IType)
-                return (IType)DeclaringEntity;
-            if (DeclaringEntity is IMethod)
-                return ((IMethod)DeclaringEntity).DeclaringType;
-            return null;
-        }
-    }
+  bool IType.IsPointer {
+    get { return false; }
+  }
 
-    protected IMethod DeclaringMethod
-    {
-        get {
-            return DeclaringEntity as IMethod;
-        }
-    }
+  public virtual bool IsVoid {
+    get { return false; }
+  }
 
-    bool IType.IsAbstract
-    {
-        get {
-            return false;
-        }
-    }
+  public int GetTypeDepth() { return DeclaringType.GetTypeDepth() + 1; }
 
-    bool IType.IsInterface
-    {
-        get {
-            return false;
-        }
-    }
+  IType IType.ElementType {
+    get { return null; }
+  }
 
-    bool IType.IsEnum
-    {
-        get {
-            return false;
-        }
-    }
+  public IType BaseType {
+    get { return FindBaseType(); }
+  }
 
-    public bool IsByRef
-    {
-        get {
-            return false;
-        }
-    }
+  public IEntity GetDefaultMember() { return null; }
 
-    bool IType.IsFinal
-    {
-        get {
-            return true;
-        }
-    }
+  public IType[] GetInterfaces() {
+    return Array.FindAll(GetTypeConstraints(), type => type.IsInterface);
+  }
 
-    bool IType.IsArray
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsSubclassOf(IType other) {
+    return (other == BaseType || BaseType.IsSubclassOf(other));
+  }
 
-    bool IType.IsPointer
-    {
-        get {
-            return false;
-        }
-    }
+  public virtual bool IsAssignableFrom(IType other) {
+    if (other == this)
+      return true;
 
-    public virtual bool IsVoid
-    {
-        get {
-            return false;
-        }
-    }
+    if (other.IsNull())
+      return IsClass;
 
-    public int GetTypeDepth()
-    {
-        return DeclaringType.GetTypeDepth() + 1;
-    }
+    var otherParameter = other as IGenericParameter;
+    if (otherParameter != null &&
+        Array.Exists(otherParameter.GetTypeConstraints(),
+                     constraint => TypeCompatibilityRules.IsAssignableFrom(
+                         this, constraint)))
+      return true;
 
-    IType IType.ElementType
-    {
-        get {
-            return null;
-        }
-    }
+    return false;
+  }
 
-    public IType BaseType
-    {
-        get {
-            return FindBaseType();
-        }
-    }
+  IGenericTypeInfo IType.GenericInfo {
+    get { return null; }
+  }
 
-    public IEntity GetDefaultMember()
-    {
-        return null;
-    }
+  IConstructedTypeInfo IType.ConstructedInfo {
+    get { return null; }
+  }
 
-    public IType[] GetInterfaces()
-    {
-        return Array.FindAll(GetTypeConstraints(), type => type.IsInterface);
-    }
+  abstract public string Name { get; }
 
-    public bool IsSubclassOf(IType other)
-    {
-        return (other == BaseType || BaseType.IsSubclassOf(other));
-    }
+  public string FullName {
+    get { return string.Format("{0}.{1}", DeclaringEntity.FullName, Name); }
+  }
 
-    public virtual bool IsAssignableFrom(IType other)
-    {
-        if (other == this)
-            return true;
+  public EntityType EntityType {
+    get { return EntityType.Type; }
+  }
 
-        if (other.IsNull())
-            return IsClass;
+  public IType Type {
+    get { return this; }
+  }
 
-        var otherParameter = other as IGenericParameter;
-        if (otherParameter != null && Array.Exists(otherParameter.GetTypeConstraints(), constraint => TypeCompatibilityRules.IsAssignableFrom(this, constraint)))
-            return true;
+  INamespace INamespace.ParentNamespace {
+    get { return DeclaringType; }
+  }
 
-        return false;
-    }
+  IEnumerable<IEntity> INamespace.GetMembers() {
+    return NullNamespace.EmptyEntityArray;
+  }
 
-    IGenericTypeInfo IType.GenericInfo
-    {
-        get {
-            return null;
-        }
-    }
+  bool INamespace.Resolve(ICollection<IEntity> resultingSet, string name,
+                          EntityType typesToConsider) {
+    var resolved = false;
+    foreach (IType type in GetTypeConstraints())
+      resolved |= type.Resolve(resultingSet, name, typesToConsider);
+    resolved |= _tss.ObjectType.Resolve(resultingSet, name, typesToConsider);
+    return resolved;
+  }
 
-    IConstructedTypeInfo IType.ConstructedInfo
-    {
-        get {
-            return null;
-        }
-    }
+  override public string ToString() { return Name; }
 
-    abstract public string Name {
-        get;
-    }
+  bool IEntityWithAttributes.IsDefined(IType attributeType) {
+    throw new NotImplementedException();
+  }
 
-    public string FullName
-    {
-        get {
-            return string.Format("{0}.{1}", DeclaringEntity.FullName, Name);
-        }
-    }
+  protected IType FindBaseType() {
+    foreach (IType type in GetTypeConstraints())
+      if (!type.IsInterface)
+        return type;
+    return _tss.ObjectType;
+  }
 
-    public EntityType EntityType
-    {
-        get {
-            return EntityType.Type;
-        }
-    }
+  private ArrayTypeCache _arrayTypes;
 
-    public IType Type
-    {
-        get {
-            return this;
-        }
-    }
+  public IArrayType MakeArrayType(int rank) {
+    if (null == _arrayTypes)
+      _arrayTypes = new ArrayTypeCache(this);
+    return _arrayTypes.MakeArrayType(rank);
+  }
 
-    INamespace INamespace.ParentNamespace
-    {
-        get {
-            return DeclaringType;
-        }
-    }
+  public IType MakePointerType() { return null; }
 
-    IEnumerable<IEntity> INamespace.GetMembers()
-    {
-        return NullNamespace.EmptyEntityArray;
-    }
+  public bool IsGenericType {
+    get { return false; }
+  }
 
-    bool INamespace.Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
-    {
-        var resolved = false;
-        foreach (IType type in GetTypeConstraints())
-            resolved |= type.Resolve(resultingSet, name, typesToConsider);
-        resolved |= _tss.ObjectType.Resolve(resultingSet, name, typesToConsider);
-        return resolved;
-    }
-
-    override public string ToString()
-    {
-        return Name;
-    }
-
-    bool IEntityWithAttributes.IsDefined(IType attributeType)
-    {
-        throw new NotImplementedException();
-    }
-
-    protected IType FindBaseType()
-    {
-        foreach (IType type in GetTypeConstraints())
-            if (!type.IsInterface)
-                return type;
-        return _tss.ObjectType;
-    }
-
-    private ArrayTypeCache _arrayTypes;
-
-    public IArrayType MakeArrayType(int rank)
-    {
-        if (null == _arrayTypes)
-            _arrayTypes = new ArrayTypeCache(this);
-        return _arrayTypes.MakeArrayType(rank);
-    }
-
-    public IType MakePointerType()
-    {
-        return null;
-    }
-
-    public bool IsGenericType
-    {
-        get {
-            return false;
-        }
-    }
-
-    public IType GenericDefinition
-    {
-        get {
-            return null;
-        }
-    }
+  public IType GenericDefinition {
+    get { return null; }
+  }
 }
 }

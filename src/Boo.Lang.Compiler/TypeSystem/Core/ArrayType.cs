@@ -2,313 +2,222 @@
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
 //
-// Redistribution and use in source and binary forms, with or without modification,
-// are permitted provided that the following conditions are met:
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
 //
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
+//     * Redistributions in binary form must reproduce the above copyright
+//     notice, this list of conditions and the following disclaimer in the
+//     documentation and/or other materials provided with the distribution.
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
 using System.Collections.Generic;
 using Boo.Lang.Compiler.TypeSystem.Services;
 using Boo.Lang.Environments;
 
-namespace Boo.Lang.Compiler.TypeSystem.Core
-{
-public class ArrayType : IArrayType
-{
-    readonly IType _elementType;
+namespace Boo.Lang.Compiler.TypeSystem.Core {
+public class ArrayType : IArrayType {
+  readonly IType _elementType;
 
-    readonly int _rank;
+  readonly int _rank;
 
-    public ArrayType(IType elementType, int rank)
-    {
-        _elementType = elementType;
-        _rank = rank;
+  public ArrayType(IType elementType, int rank) {
+    _elementType = elementType;
+    _rank = rank;
+  }
+
+  public IEntity DeclaringEntity {
+    get { return null; }
+  }
+
+  public string Name {
+    get {
+      return _rank > 1? "(" + _elementType + ", " + _rank +
+                         ")" : "(" + _elementType + ")";
     }
+  }
 
-    public IEntity DeclaringEntity
-    {
-        get {
-            return null;
-        }
-    }
+  public EntityType EntityType {
+    get { return EntityType.Array; }
+  }
 
-    public string Name
-    {
-        get {
-            return _rank > 1 ? "(" + _elementType + ", " + _rank + ")" : "(" + _elementType + ")";
-        }
-    }
+  public string FullName {
+    get { return Name; }
+  }
 
-    public EntityType EntityType
-    {
-        get {
-            return EntityType.Array;
-        }
-    }
+  public IType Type {
+    get { return this; }
+  }
 
-    public string FullName
-    {
-        get {
-            return Name;
-        }
-    }
+  public bool IsFinal {
+    get { return true; }
+  }
 
-    public IType Type
-    {
-        get {
-            return this;
-        }
-    }
+  public bool IsByRef {
+    get { return false; }
+  }
 
-    public bool IsFinal
-    {
-        get {
-            return true;
-        }
-    }
+  public bool IsClass {
+    get { return false; }
+  }
 
-    public bool IsByRef
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsInterface {
+    get { return false; }
+  }
 
-    public bool IsClass
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsAbstract {
+    get { return false; }
+  }
 
-    public bool IsInterface
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsEnum {
+    get { return false; }
+  }
 
-    public bool IsAbstract
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsValueType {
+    get { return false; }
+  }
 
-    public bool IsEnum
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsArray {
+    get { return true; }
+  }
 
-    public bool IsValueType
-    {
-        get {
-            return false;
-        }
-    }
+  public bool IsPointer {
+    get { return false; }
+  }
 
-    public bool IsArray
-    {
-        get {
-            return true;
-        }
-    }
+  public virtual bool IsVoid {
+    get { return false; }
+  }
 
-    public bool IsPointer
-    {
-        get {
-            return false;
-        }
-    }
+  public int GetTypeDepth() { return 2; }
 
-    public virtual bool IsVoid
-    {
-        get {
-            return false;
-        }
-    }
+  public int Rank {
+    get { return _rank; }
+  }
 
-    public int GetTypeDepth()
-    {
-        return 2;
-    }
+  public IType ElementType {
+    get { return _elementType; }
+  }
 
-    public int Rank
-    {
-        get {
-            return _rank;
-        }
-    }
+  public IType BaseType {
+    get { return My<TypeSystemServices>.Instance.ArrayType; }
+  }
 
-    public IType ElementType
-    {
-        get {
-            return _elementType;
-        }
-    }
+  public IEntity GetDefaultMember() { return null; }
 
-    public IType BaseType
-    {
-        get {
-            return My<TypeSystemServices>.Instance.ArrayType;
-        }
-    }
+  public virtual bool IsSubclassOf(IType other) {
+    TypeSystemServices services = My<TypeSystemServices>.Instance;
+    if (other == services.ArrayType || services.ArrayType.IsSubclassOf(other))
+      return true;
 
-    public IEntity GetDefaultMember()
-    {
-        return null;
-    }
+    // Arrays also implement generic IEnumerable of their element type
+    if (other.ConstructedInfo != null &&
+        other.ConstructedInfo.GenericDefinition ==
+            services.IEnumerableGenericType &&
+        IsSubclassOfGenericEnumerable(other))
+      return true;
 
-    public virtual bool IsSubclassOf(IType other)
-    {
-        TypeSystemServices services = My<TypeSystemServices>.Instance;
-        if (other == services.ArrayType || services.ArrayType.IsSubclassOf(other))
-            return true;
+    return false;
+  }
 
-        // Arrays also implement generic IEnumerable of their element type
-        if (other.ConstructedInfo != null &&
-                other.ConstructedInfo.GenericDefinition == services.IEnumerableGenericType &&
-                IsSubclassOfGenericEnumerable(other))
-            return true;
+  protected virtual bool IsSubclassOfGenericEnumerable(IType enumerableType) {
+    return IsAssignableFrom(enumerableType.ConstructedInfo.GenericArguments[0],
+                            _elementType);
+  }
 
-        return false;
-    }
+  public virtual bool IsAssignableFrom(IType other) {
+    if (other == this || other.IsNull())
+      return true;
 
-    protected virtual bool IsSubclassOfGenericEnumerable(IType enumerableType)
-    {
-        return IsAssignableFrom(enumerableType.ConstructedInfo.GenericArguments[0], _elementType);
-    }
+    if (!other.IsArray)
+      return false;
 
-    public virtual bool IsAssignableFrom(IType other)
-    {
-        if (other == this || other.IsNull())
-            return true;
+    var otherArray = (IArrayType)other;
+    if (otherArray.Rank != _rank)
+      return false;
 
-        if (!other.IsArray)
-            return false;
+    if (otherArray == EmptyArrayType.Default)
+      return true;
 
-        var otherArray = (IArrayType)other;
-        if (otherArray.Rank != _rank)
-            return false;
+    IType otherElementType = otherArray.ElementType;
+    return IsAssignableFrom(_elementType, otherElementType);
+  }
 
-        if (otherArray == EmptyArrayType.Default)
-            return true;
+  private bool IsAssignableFrom(IType expectedType, IType actualType) {
+    return TypeCompatibilityRules.IsAssignableFrom(expectedType, actualType);
+  }
 
-        IType otherElementType = otherArray.ElementType;
-        return IsAssignableFrom(_elementType, otherElementType);
-    }
+  public IType[] GetInterfaces() {
+    TypeSystemServices services = My<TypeSystemServices>.Instance;
+    return new[] {
+      services.IEnumerableType,
+      services.ICollectionType,
+      services.IListType,
+      services.IEnumerableGenericType.GenericInfo.ConstructType(_elementType),
+      services.ICollectionGenericType.GenericInfo.ConstructType(_elementType),
+      services.IListGenericType.GenericInfo.ConstructType(_elementType),
+    };
+  }
 
-    private bool IsAssignableFrom(IType expectedType, IType actualType)
-    {
-        return TypeCompatibilityRules.IsAssignableFrom(expectedType, actualType);
-    }
+  public IEnumerable<IEntity> GetMembers() { return BaseType.GetMembers(); }
 
-    public IType[] GetInterfaces()
-    {
-        TypeSystemServices services = My<TypeSystemServices>.Instance;
-        return new[] {
-            services.IEnumerableType,
-            services.ICollectionType,
-            services.IListType,
-            services.IEnumerableGenericType.GenericInfo.ConstructType(_elementType),
-            services.ICollectionGenericType.GenericInfo.ConstructType(_elementType),
-            services.IListGenericType.GenericInfo.ConstructType(_elementType),
-        };
-    }
+  public INamespace ParentNamespace {
+    get { return ElementType.ParentNamespace; }
+  }
 
-    public IEnumerable<IEntity> GetMembers()
-    {
-        return BaseType.GetMembers();
-    }
+  public bool Resolve(ICollection<IEntity> resultingSet, string name,
+                      EntityType typesToConsider) {
+    return BaseType.Resolve(resultingSet, name, typesToConsider);
+  }
 
-    public INamespace ParentNamespace
-    {
-        get {
-            return ElementType.ParentNamespace;
-        }
-    }
+  override public string ToString() { return this.DisplayName(); }
 
-    public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
-    {
-        return BaseType.Resolve(resultingSet, name, typesToConsider);
-    }
+  IGenericTypeInfo IType.GenericInfo {
+    get { return null; }
+  }
 
-    override public string ToString()
-    {
-        return this.DisplayName();
-    }
+  IConstructedTypeInfo IType.ConstructedInfo {
+    get { return null; }
+  }
 
-    IGenericTypeInfo IType.GenericInfo
-    {
-        get {
-            return null;
-        }
-    }
+#region IEntityWithAttributes Members
 
-    IConstructedTypeInfo IType.ConstructedInfo
-    {
-        get {
-            return null;
-        }
-    }
+  public bool IsDefined(IType attributeType) { return false; }
 
-    #region IEntityWithAttributes Members
+#endregion
 
-    public bool IsDefined(IType attributeType)
-    {
-        return false;
-    }
+  private ArrayTypeCache _arrayTypes;
 
-    #endregion
+  public IArrayType MakeArrayType(int rank) {
+    if (null == _arrayTypes)
+      _arrayTypes = new ArrayTypeCache(this);
+    return _arrayTypes.MakeArrayType(rank);
+  }
 
-    private ArrayTypeCache _arrayTypes;
+  public IType MakePointerType() { return null; }
 
-    public IArrayType MakeArrayType(int rank)
-    {
-        if (null == _arrayTypes)
-            _arrayTypes = new ArrayTypeCache(this);
-        return _arrayTypes.MakeArrayType(rank);
-    }
+  public bool IsGenericType {
+    get { return false; }
+  }
 
-    public IType MakePointerType()
-    {
-        return null;
-    }
-
-    public bool IsGenericType
-    {
-        get {
-            return false;
-        }
-    }
-
-    public IType GenericDefinition
-    {
-        get {
-            return null;
-        }
-    }
+  public IType GenericDefinition {
+    get { return null; }
+  }
 }
 }
-
