@@ -49,6 +49,8 @@ namespace Boo.Lang.Compiler.TypeSystem
 
 		bool IsPointer { get; }
 
+		bool IsVoid { get; }
+
 		IEntity DeclaringEntity { get; }
 		
 		int GetTypeDepth();
@@ -68,6 +70,10 @@ namespace Boo.Lang.Compiler.TypeSystem
 		IGenericTypeInfo GenericInfo { get; }
 		
 		IConstructedTypeInfo ConstructedInfo { get; }
+
+		bool IsGenericType { get; }
+
+		IType GenericDefinition { get; }
 
 		IArrayType MakeArrayType(int rank);
 

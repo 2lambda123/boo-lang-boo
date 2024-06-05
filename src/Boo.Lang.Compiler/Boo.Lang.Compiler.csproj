@@ -88,7 +88,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.4.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Reflection.Metadata, Version=1.4.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.1.5.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core">
       <SpecificVersion>False</SpecificVersion>
@@ -598,6 +604,7 @@
     <Compile Include="TypeSystem\IMember.cs" />
     <Compile Include="TypeSystem\IMethod.cs" />
     <Compile Include="TypeSystem\IMethodBase.cs" />
+    <Compile Include="TypeSystem\IModifiedType.cs" />
     <Compile Include="TypeSystem\INameSpace.cs" />
     <Compile Include="TypeSystem\Internal\AbstractInternalType.cs" />
     <Compile Include="TypeSystem\Internal\AbstractLocalEntity.cs" />
@@ -632,6 +639,32 @@
     <Compile Include="TypeSystem\IType.cs" />
     <Compile Include="TypeSystem\ITypedEntity.cs" />
     <Compile Include="TypeSystem\Null.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataAbstractExternalGenericInfo.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalCallableType.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalConstructedMethodInfo.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalConstructor.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalEvent.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalField.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalGenericMethodInfo.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalGenericParameter.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalGenericTypeInfo.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalMethodr.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalEntity.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalParameter.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalProperty.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataExternalType.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataAssemblyReference.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataNamespace.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataNamespaceBuilder.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataPointerType.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataReferenceResolver.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataSignatureDecoder.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\Resolvers\AssemblyReferenceData.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\Resolvers\CompositeAssemblyReferenceResolver.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\Resolvers\GacAssemblyReferenceResolver.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\Resolvers\HResult.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\Resolvers\IAssemblyReferenceResolver.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\Resolvers\SameDirectoryAssemblyReferenceResolver.cs" />
     <Compile Include="TypeSystem\Reflection\AbstractExternalGenericInfo.cs" />
     <Compile Include="TypeSystem\Reflection\AssemblyEqualityComparer.cs" />
     <Compile Include="TypeSystem\Reflection\AssemblyReference.cs" />
@@ -656,6 +689,7 @@
     <Compile Include="TypeSystem\Reflection\ReflectionNamespace.cs" />
     <Compile Include="TypeSystem\Reflection\ReflectionNamespaceBuilder.cs" />
     <Compile Include="TypeSystem\Reflection\ReflectionTypeSystemProvider.cs" />
+    <Compile Include="TypeSystem\ReflectionMetadata\MetadataTypeSystemProvider.cs" />
     <Compile Include="TypeSystem\Services\AccessibilityChecker.cs" />
     <Compile Include="TypeSystem\Services\AnonymousCallablesManager.cs" />
     <Compile Include="TypeSystem\Services\AsyncHelper.cs" />
@@ -692,6 +726,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="boo.snk" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">

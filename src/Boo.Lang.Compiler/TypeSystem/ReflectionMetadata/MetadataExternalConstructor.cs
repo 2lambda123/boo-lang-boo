@@ -1,5 +1,5 @@
 ﻿#region license
-// Copyright (c) 2003, 2004, 2005 Rodrigo B. de Oliveira (rbo@acm.org)
+// Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without modification,
@@ -26,19 +26,34 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-namespace Boo.Lang.Compiler.TypeSystem
+namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	public enum BuiltinFunctionType
+	using System.Reflection.Metadata;
+
+	public class MetadataExternalConstructor : MetadataExternalMethod, IConstructor
 	{
-		Len,
-		AddressOf,
-		Eval,
-		Quack, // duck typing support,
-		Switch, // switch IL opcode
-		InitValueType, // initobj IL opcode
-		Custom, // custom builtin function
-		Default, // C# style default<T>
-		Sizeof // sizeof IL opcode
+		public MetadataExternalConstructor(MetadataTypeSystemProvider provider, MethodDefinition ci, MetadataExternalType parent, MetadataReader reader)
+			: base(provider, ci, parent, reader)
+		{
+		}
+
+		public override string Name
+		{
+			get { return "constructor"; }
+		}
+
+		override public EntityType EntityType
+		{
+			get
+			{
+				return EntityType.Constructor;
+			}
+		}
+
+		override public IType ReturnType
+		{
+			get { return _provider.Map(Types.Void); }
+		}
 	}
+
 }

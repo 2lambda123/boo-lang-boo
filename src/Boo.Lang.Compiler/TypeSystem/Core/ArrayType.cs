@@ -114,6 +114,11 @@ namespace Boo.Lang.Compiler.TypeSystem.Core
 			get { return false; }
 		}
 
+		public virtual bool IsVoid
+		{
+			get { return false; }
+		}
+
 		public int GetTypeDepth()
 		{
 			return 2;
@@ -256,6 +261,16 @@ namespace Boo.Lang.Compiler.TypeSystem.Core
 		public IType MakePointerType()
 		{
 			return null;
+		}
+
+		public bool IsGenericType
+		{
+			get { return false; }
+		}
+
+		public IType GenericDefinition
+		{
+			get { return null; }
 		}
 	}
 }

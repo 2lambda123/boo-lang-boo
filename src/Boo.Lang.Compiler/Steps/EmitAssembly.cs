@@ -728,7 +728,7 @@ namespace Boo.Lang.Compiler.Steps
 
 			_returnType = returnType;
 			_returnStatements = 0;
-			_returnImplicit = IsVoid(returnType);
+			_returnImplicit = returnType.IsVoid;
 			_hasLeaveWithStoredValue = false;
 
 			//we may not actually use (any/all of) them, but at least they're ready
@@ -747,7 +747,7 @@ namespace Boo.Lang.Compiler.Steps
 			//2) load of a default value (implicit returns [e.g return without expression])
 			//3) load of the `leave' stored value
 
-			bool hasDefaultValueReturn = _returnImplicit && !IsVoid(_returnType);
+			bool hasDefaultValueReturn = _returnImplicit && !_returnType.IsVoid;
 			if (hasDefaultValueReturn)
 			{
 				if (_returnStatements == -1) //emit branch only if instructed to do so (-1)
@@ -1040,13 +1040,8 @@ namespace Boo.Lang.Compiler.Steps
 
 		void DiscardValueOnStack()
 		{
-			if (!IsVoid(PopType()))
+			if (!PopType().IsVoid)
 				_il.Emit(OpCodes.Pop);
-		}
-
-		bool IsVoid(IType type)
-		{
-			return type == TypeSystemServices.VoidType;
 		}
 
 		override public void OnUnlessStatement(UnlessStatement node)
@@ -3864,11 +3859,38 @@ namespace Boo.Lang.Compiler.Steps
 			Call(RuntimeHelpers_InitializeArray);
 		}
 
+		private int PrimitiveSizeOf(IType type)
+		{
+			if (type == TypeSystemServices.IntType)
+				return 4;
+			else if (type == TypeSystemServices.UIntType)
+				return 4;
+			else if (IsLong(type))
+				return 8;
+			else if (type == TypeSystemServices.ULongType)
+				return 8;
+			else if (type == TypeSystemServices.ShortType)
+				return 2;
+			else if (type == TypeSystemServices.UShortType)
+				return 2;
+			else if (type == TypeSystemServices.ByteType)
+				return 1;
+			else if (type == TypeSystemServices.SByteType)
+				return 1;
+			else if (type == TypeSystemServices.SingleType)
+				return 4;
+			else if (type == TypeSystemServices.DoubleType)
+				return 8;
+			else if (type == TypeSystemServices.BoolType)
+				return 1;
+			throw new ArgumentException(string.Format("Type {0} is not a primitive type", type.Name));
+		}
+
 		Dictionary<byte[], FieldBuilder> _packedArrays = new Dictionary<byte[], FieldBuilder>(ValueTypeArrayEqualityComparer<byte>.Default);
 
 		byte[] CreateByteArrayFromLiteralCollection(IType type, ExpressionCollection items)
 		{
-			using (MemoryStream ms = new MemoryStream(items.Count * TypeSystemServices.SizeOf(type)))
+			using (MemoryStream ms = new MemoryStream(items.Count * PrimitiveSizeOf(type)))
 			{
 				using (BinaryWriter writer = new BinaryWriter(ms))
 				{

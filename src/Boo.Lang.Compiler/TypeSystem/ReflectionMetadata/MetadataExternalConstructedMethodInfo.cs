@@ -26,19 +26,45 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-
-namespace Boo.Lang.Compiler.TypeSystem
+namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	public enum BuiltinFunctionType
+	using System.Linq;
+
+	public class MetadataExternalConstructedMethodInfo : IConstructedMethodInfo
 	{
-		Len,
-		AddressOf,
-		Eval,
-		Quack, // duck typing support,
-		Switch, // switch IL opcode
-		InitValueType, // initobj IL opcode
-		Custom, // custom builtin function
-		Default, // C# style default<T>
-		Sizeof // sizeof IL opcode
+		private readonly MetadataExternalMethod _method;
+		private readonly MetadataTypeSystemProvider _tss;
+		private readonly IType[] _arguments;
+
+		public MetadataExternalConstructedMethodInfo(
+			MetadataTypeSystemProvider tss,
+			MetadataExternalMethod method,
+			IType[] arguments)
+		{
+			_method = method;
+			_tss = tss;
+			_arguments = arguments;
+		}
+
+		public IMethod GenericDefinition
+		{
+			get
+			{
+				return _tss.Map((MetadataExternalType)_method.DeclaringType, _method.MethodInfo);
+			}
+		}
+
+		public IType[] GenericArguments
+		{
+			get
+			{
+				return _arguments;
+			}
+		}
+
+		public bool FullyConstructed
+		{
+			get { return !_arguments.OfType<IGenericParameter>().Any(); }
+		}
 	}
 }

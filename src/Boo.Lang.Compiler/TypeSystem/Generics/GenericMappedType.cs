@@ -128,7 +128,12 @@ namespace Boo.Lang.Compiler.TypeSystem.Generics
             get { return _sourceType.IsPointer; }
         }
 
-        public int GetTypeDepth()
+		public virtual bool IsVoid
+		{
+			get { return false; }
+		}
+
+		public int GetTypeDepth()
         {
             return _sourceType.GetTypeDepth();
         }
@@ -237,5 +242,15 @@ namespace Boo.Lang.Compiler.TypeSystem.Generics
         {
             return null;
         }
-    }
+
+		public bool IsGenericType
+		{
+			get { return _sourceType.IsGenericType; }
+		}
+
+		public IType GenericDefinition
+		{
+			get { return _sourceType.GenericDefinition; }
+		}
+	}
 }

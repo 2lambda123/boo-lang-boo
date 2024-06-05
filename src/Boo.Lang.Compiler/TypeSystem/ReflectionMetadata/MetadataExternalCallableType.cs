@@ -26,93 +26,46 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
-using System;
-using System.Diagnostics;
+using System.Linq;
+using Boo.Lang.Environments;
 
-namespace Boo.Lang.Compiler.TypeSystem.Core
+namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	public class AnonymousCallableType : AbstractType, ICallableType
+	using System.Reflection.Metadata;
+
+	public class MetadataExternalCallableType : MetadataExternalType, ICallableType
 	{
-		private readonly TypeSystemServices _typeSystemServices;
-		private readonly CallableSignature _signature;
-		IType _concreteType;
-		
-		internal AnonymousCallableType(TypeSystemServices services, CallableSignature signature)
+		private readonly IMethod _invoke;
+
+		public MetadataExternalCallableType(MetadataTypeSystemProvider provider, TypeDefinition type, MetadataReader reader)
+			: base(provider, type, reader)
 		{
-			_typeSystemServices = services;
-			_signature = signature;
+			_invoke = this.GetMembers().OfType<IMethod>().Where(m => m.Name == "Invoke").Single();
 		}
-		
-		public IType ConcreteType
-		{
-			get { return _concreteType; }
-			
-			set
-			{
-				if (value == null || _concreteType != null) throw new InvalidOperationException();	
-				_concreteType = value;
-			}
-		}
-		
-		override public IType BaseType
-		{
-			get { return _typeSystemServices.MulticastDelegateType; }
-		}
-		
-		override public bool IsSubclassOf(IType other)
-		{			
-			return BaseType.IsSubclassOf(other) || other == BaseType ||
-				other == _typeSystemServices.ICallableType;				
-		}
-		
-		override public bool IsAssignableFrom(IType other)
-		{
-			return _typeSystemServices.IsCallableTypeAssignableFrom(this, other);
-		}
-		
+
 		public CallableSignature GetSignature()
 		{
-			return _signature;
+			return _invoke.CallableType.GetSignature();
 		}
 
 		public bool IsAnonymous
 		{
-			get { return true; }
+			get { return false; }
 		}
 
-		override public string Name
+		override public bool IsAssignableFrom(IType other)
 		{
-			get { return _signature.ToString();  }
-		}
-		
-		override public EntityType EntityType
-		{
-			get { return EntityType.Type; }
-		}
-		
-		override public int GetTypeDepth()
-		{
-			return 3;
+			return My<TypeSystemServices>.Instance.IsCallableTypeAssignableFrom(this, other);
 		}
 
 		public bool IsGenericType
 		{
-			get
-			{
-				if (_concreteType == null)
-					throw new InvalidOperationException();
-				return _concreteType.IsGenericType;
-			}
+			get { return _invoke.GenericInfo != null; }
 		}
 
 		public IType GenericDefinition
 		{
-			get
-			{
-				if (_concreteType == null)
-					throw new InvalidOperationException();
-				return _concreteType.GenericDefinition;
-			}
+			get { return this.IsGenericType ? this : null; }
 		}
 	}
 }

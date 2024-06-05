@@ -26,19 +26,42 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using Boo.Lang.Compiler.TypeSystem.Generics;
 
-namespace Boo.Lang.Compiler.TypeSystem
+namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	public enum BuiltinFunctionType
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Reflection.Metadata;
+
+	public class MetadataExternalGenericMethodInfo : MetadataAbstractExternalGenericInfo<IMethod>, IGenericMethodInfo
 	{
-		Len,
-		AddressOf,
-		Eval,
-		Quack, // duck typing support,
-		Switch, // switch IL opcode
-		InitValueType, // initobj IL opcode
-		Custom, // custom builtin function
-		Default, // C# style default<T>
-		Sizeof // sizeof IL opcode
+		private readonly MetadataExternalMethod _method;
+
+		public MetadataExternalGenericMethodInfo(
+			MetadataTypeSystemProvider provider,
+			MetadataExternalMethod method,
+			MetadataExternalType parent,
+			MetadataReader reader) : base(provider, parent, reader)
+		{
+			_method = method;
+		}
+
+		public IMethod ConstructMethod(IType[] arguments)
+		{
+			return ConstructEntity(arguments);
+		}
+
+		protected override GenericParameter[] GetActualGenericParameters()
+		{
+			var parameters = _method.MethodInfo.GetGenericParameters().Select(_reader.GetGenericParameter);
+			return parameters.ToArray();
+		}
+
+		protected override IMethod ConstructInternalEntity(IType[] arguments)
+		{
+			return new GenericConstructedMethod(_method, arguments);
+		}
 	}
 }

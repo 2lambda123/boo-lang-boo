@@ -26,19 +26,24 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using System;
+using System.Reflection.Metadata;
 
-namespace Boo.Lang.Compiler.TypeSystem
+namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	public enum BuiltinFunctionType
+	using Boo.Lang.Compiler.TypeSystem.ReflectionMetadata.Resolvers;
+
+	class MetadataReferenceResolver
 	{
-		Len,
-		AddressOf,
-		Eval,
-		Quack, // duck typing support,
-		Switch, // switch IL opcode
-		InitValueType, // initobj IL opcode
-		Custom, // custom builtin function
-		Default, // C# style default<T>
-		Sizeof // sizeof IL opcode
+		internal static string FindAssembly(AssemblyReference reference, MetadataReader reader, string localDir)
+		{
+			var name = new AssemblyReferenceData(reference, reader);
+			var resolver = new CompositeAssemblyReferenceResolver(
+				new GacAssemblyReferenceResolver(),
+				new SameDirectoryAssemblyReferenceResolver(localDir));
+			string result = null;
+			resolver.TryGetAssemblyPath(name, out result);
+			return result;
+		}
 	}
 }

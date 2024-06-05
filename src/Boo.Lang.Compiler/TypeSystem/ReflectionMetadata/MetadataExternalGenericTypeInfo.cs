@@ -26,19 +26,40 @@
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endregion
 
+using Boo.Lang.Compiler.TypeSystem.Generics;
+using Boo.Lang.Compiler.TypeSystem.Reflection;
 
-namespace Boo.Lang.Compiler.TypeSystem
+namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	public enum BuiltinFunctionType
+	using System;
+	using System.Linq;
+	using System.Reflection.Metadata;
+
+	class MetadataExternalGenericTypeInfo: MetadataAbstractExternalGenericInfo<IType>, IGenericTypeInfo
 	{
-		Len,
-		AddressOf,
-		Eval,
-		Quack, // duck typing support,
-		Switch, // switch IL opcode
-		InitValueType, // initobj IL opcode
-		Custom, // custom builtin function
-		Default, // C# style default<T>
-		Sizeof // sizeof IL opcode
+		public MetadataExternalGenericTypeInfo(MetadataTypeSystemProvider provider, MetadataExternalType type, MetadataReader reader)
+			: base(provider, type, reader)
+		{
+		}
+
+		public IType ConstructType(IType[] arguments)
+		{
+			return ConstructEntity(arguments);
+		}
+
+		protected override GenericParameter[] GetActualGenericParameters()
+		{
+			return _parent.ActualType.GetGenericParameters().Select(_reader.GetGenericParameter).ToArray();
+		}
+
+		protected override IType ConstructInternalEntity(IType[] arguments)
+		{
+			var callable = _parent as MetadataExternalCallableType;
+			if (callable != null)
+			{
+				return new GenericConstructedCallableType(callable, arguments);
+			}
+			return new GenericConstructedType(_parent, arguments);
+		}
 	}
 }

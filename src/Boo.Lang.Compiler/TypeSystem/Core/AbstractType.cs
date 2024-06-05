@@ -96,6 +96,11 @@ namespace Boo.Lang.Compiler.TypeSystem.Core
 			get { return false; }
 		}
 
+		public virtual bool IsVoid
+		{
+			get { return false; }
+		}
+
 		public virtual IType BaseType
 		{
 			get { return null; }
@@ -157,6 +162,16 @@ namespace Boo.Lang.Compiler.TypeSystem.Core
 		}
 
 		IConstructedTypeInfo IType.ConstructedInfo
+		{
+			get { return null; }
+		}
+
+		public bool IsGenericType
+		{
+			get { return false; }
+		}
+
+		public IType GenericDefinition
 		{
 			get { return null; }
 		}
