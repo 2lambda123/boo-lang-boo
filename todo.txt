@@ -1,7 +1,7 @@
 ﻿Please refer to our issue tracker at
 
  	http://jira.codehaus.org/secure/BrowseProject.jspa?id=10671
- 	
+
 for open issues.
 
 Those with patches are also listed here:
@@ -10,7 +10,7 @@ http://boo.codehaus.org/Open+Issues+With+Patches
 Named parameters:
 	def logHistoryFile(to: [required] fname, since: startDate as date):
 		print fname
-		
+
 	logHistoryFile(to: "foo.txt", since: date.Now - 10s)
 
 All the issues on this file will be eventually moved there.
@@ -28,7 +28,7 @@ and longer lived caching behavior.
 When a scope fails to resolve a name it delegates the resolution to its parent scope and as result
 its resolution cache always implicitly depends on its parent scope.
 
-From the outward in the scopes in the boo programming language are: 
+From the outward in the scopes in the boo programming language are:
 
 * ExternalScope: the virtual region outside the CompileUnit
 ** resolves names against references
