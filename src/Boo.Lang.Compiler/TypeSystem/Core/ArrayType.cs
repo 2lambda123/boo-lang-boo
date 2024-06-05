@@ -1,10 +1,10 @@
 #region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,237 +32,283 @@ using Boo.Lang.Environments;
 
 namespace Boo.Lang.Compiler.TypeSystem.Core
 {
-	public class ArrayType : IArrayType
-	{
-		readonly IType _elementType;
+public class ArrayType : IArrayType
+{
+    readonly IType _elementType;
 
-		readonly int _rank;
+    readonly int _rank;
 
-		public ArrayType(IType elementType, int rank)
-		{
-			_elementType = elementType;
-			_rank = rank;
-		}
+    public ArrayType(IType elementType, int rank)
+    {
+        _elementType = elementType;
+        _rank = rank;
+    }
 
-		public IEntity DeclaringEntity
-		{
-			get { return null;  }
-		}
+    public IEntity DeclaringEntity
+    {
+        get {
+            return null;
+        }
+    }
 
-		public string Name
-		{
-			get { return _rank > 1 ? "(" + _elementType + ", " + _rank + ")" : "(" + _elementType + ")"; }
-		}
-		
-		public EntityType EntityType
-		{
-			get { return EntityType.Array; }
-		}
-		
-		public string FullName
-		{
-			get { return Name; }
-		}
-		
-		public IType Type
-		{
-			get { return this; }
-		}
-		
-		public bool IsFinal
-		{
-			get { return true; }
-		}
-		
-		public bool IsByRef
-		{
-			get { return false; }
-		}
-		
-		public bool IsClass
-		{
-			get { return false; }
-		}
-		
-		public bool IsInterface
-		{
-			get { return false; }
-		}
-		
-		public bool IsAbstract
-		{
-			get { return false; }
-		}
-		
-		public bool IsEnum
-		{
-			get { return false; }
-		}
-		
-		public bool IsValueType
-		{
-			get { return false; }
-		}
+    public string Name
+    {
+        get {
+            return _rank > 1 ? "(" + _elementType + ", " + _rank + ")" : "(" + _elementType + ")";
+        }
+    }
 
-		public bool IsArray
-		{
-			get { return true; }
-		}
+    public EntityType EntityType
+    {
+        get {
+            return EntityType.Array;
+        }
+    }
 
-		public bool IsPointer
-		{
-			get { return false; }
-		}
+    public string FullName
+    {
+        get {
+            return Name;
+        }
+    }
 
-		public virtual bool IsVoid
-		{
-			get { return false; }
-		}
+    public IType Type
+    {
+        get {
+            return this;
+        }
+    }
 
-		public int GetTypeDepth()
-		{
-			return 2;
-		}
+    public bool IsFinal
+    {
+        get {
+            return true;
+        }
+    }
 
-		public int Rank
-		{
-			get { return _rank; }
-		}
+    public bool IsByRef
+    {
+        get {
+            return false;
+        }
+    }
 
-		public IType ElementType
-		{
-			get { return _elementType; }
-		}
+    public bool IsClass
+    {
+        get {
+            return false;
+        }
+    }
 
-		public IType BaseType
-		{
-			get { return My<TypeSystemServices>.Instance.ArrayType; }
-		}
+    public bool IsInterface
+    {
+        get {
+            return false;
+        }
+    }
 
-		public IEntity GetDefaultMember()
-		{
-			return null;
-		}
-		
-		public virtual bool IsSubclassOf(IType other)
-		{
-			TypeSystemServices services = My<TypeSystemServices>.Instance;
-			if (other == services.ArrayType || services.ArrayType.IsSubclassOf(other))
-				return true;
-			
-			// Arrays also implement generic IEnumerable of their element type 
-			if (other.ConstructedInfo != null && 
-			    other.ConstructedInfo.GenericDefinition == services.IEnumerableGenericType &&
-			    IsSubclassOfGenericEnumerable(other))
-				return true;
+    public bool IsAbstract
+    {
+        get {
+            return false;
+        }
+    }
 
-			return false;
-		}
+    public bool IsEnum
+    {
+        get {
+            return false;
+        }
+    }
 
-		protected virtual bool IsSubclassOfGenericEnumerable(IType enumerableType)
-		{
-			return IsAssignableFrom(enumerableType.ConstructedInfo.GenericArguments[0], _elementType);
-		}
+    public bool IsValueType
+    {
+        get {
+            return false;
+        }
+    }
 
-		public virtual bool IsAssignableFrom(IType other)
-		{			
-			if (other == this || other.IsNull())
-				return true;
+    public bool IsArray
+    {
+        get {
+            return true;
+        }
+    }
 
-			if (!other.IsArray)
-				return false;
+    public bool IsPointer
+    {
+        get {
+            return false;
+        }
+    }
 
-			var otherArray = (IArrayType)other;
-			if (otherArray.Rank != _rank)
-				return false;
+    public virtual bool IsVoid
+    {
+        get {
+            return false;
+        }
+    }
 
-			if (otherArray == EmptyArrayType.Default)
-				return true;
+    public int GetTypeDepth()
+    {
+        return 2;
+    }
 
-			IType otherElementType = otherArray.ElementType;
-			return IsAssignableFrom(_elementType, otherElementType);
-		}
+    public int Rank
+    {
+        get {
+            return _rank;
+        }
+    }
 
-	    private bool IsAssignableFrom(IType expectedType, IType actualType)
-	    {
-	        return TypeCompatibilityRules.IsAssignableFrom(expectedType, actualType);
-	    }
+    public IType ElementType
+    {
+        get {
+            return _elementType;
+        }
+    }
 
-	    public IType[] GetInterfaces()
-		{
-			TypeSystemServices services = My<TypeSystemServices>.Instance;
-			return new[] {
-				services.IEnumerableType,
-				services.ICollectionType,
-				services.IListType,
-				services.IEnumerableGenericType.GenericInfo.ConstructType(_elementType),
-				services.ICollectionGenericType.GenericInfo.ConstructType(_elementType),
-				services.IListGenericType.GenericInfo.ConstructType(_elementType),
-			};
-		}
-		
-		public IEnumerable<IEntity> GetMembers()
-		{
-			return BaseType.GetMembers();
-		}
-		
-		public INamespace ParentNamespace
-		{
-			get { return ElementType.ParentNamespace; }
-		}
-		
-		public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
-		{
-			return BaseType.Resolve(resultingSet, name, typesToConsider);
-		}
-		
-		override public string ToString()
-		{
-			return this.DisplayName();
-		}
+    public IType BaseType
+    {
+        get {
+            return My<TypeSystemServices>.Instance.ArrayType;
+        }
+    }
 
-		IGenericTypeInfo IType.GenericInfo
-		{
-			get { return null; }
-		}
-		
-		IConstructedTypeInfo IType.ConstructedInfo
-		{
-			get { return null; }
-		}
+    public IEntity GetDefaultMember()
+    {
+        return null;
+    }
 
-		#region IEntityWithAttributes Members
+    public virtual bool IsSubclassOf(IType other)
+    {
+        TypeSystemServices services = My<TypeSystemServices>.Instance;
+        if (other == services.ArrayType || services.ArrayType.IsSubclassOf(other))
+            return true;
 
-		public bool IsDefined(IType attributeType)
-		{
-			return false;
-		}
+        // Arrays also implement generic IEnumerable of their element type
+        if (other.ConstructedInfo != null &&
+                other.ConstructedInfo.GenericDefinition == services.IEnumerableGenericType &&
+                IsSubclassOfGenericEnumerable(other))
+            return true;
 
-		#endregion
+        return false;
+    }
 
-		private ArrayTypeCache _arrayTypes;
+    protected virtual bool IsSubclassOfGenericEnumerable(IType enumerableType)
+    {
+        return IsAssignableFrom(enumerableType.ConstructedInfo.GenericArguments[0], _elementType);
+    }
 
-		public IArrayType MakeArrayType(int rank)
-		{
-			if (null == _arrayTypes)
-				_arrayTypes = new ArrayTypeCache(this);
-			return _arrayTypes.MakeArrayType(rank);
-		}
+    public virtual bool IsAssignableFrom(IType other)
+    {
+        if (other == this || other.IsNull())
+            return true;
 
-		public IType MakePointerType()
-		{
-			return null;
-		}
+        if (!other.IsArray)
+            return false;
 
-		public bool IsGenericType
-		{
-			get { return false; }
-		}
+        var otherArray = (IArrayType)other;
+        if (otherArray.Rank != _rank)
+            return false;
 
-		public IType GenericDefinition
-		{
-			get { return null; }
-		}
-	}
+        if (otherArray == EmptyArrayType.Default)
+            return true;
+
+        IType otherElementType = otherArray.ElementType;
+        return IsAssignableFrom(_elementType, otherElementType);
+    }
+
+    private bool IsAssignableFrom(IType expectedType, IType actualType)
+    {
+        return TypeCompatibilityRules.IsAssignableFrom(expectedType, actualType);
+    }
+
+    public IType[] GetInterfaces()
+    {
+        TypeSystemServices services = My<TypeSystemServices>.Instance;
+        return new[] {
+            services.IEnumerableType,
+            services.ICollectionType,
+            services.IListType,
+            services.IEnumerableGenericType.GenericInfo.ConstructType(_elementType),
+            services.ICollectionGenericType.GenericInfo.ConstructType(_elementType),
+            services.IListGenericType.GenericInfo.ConstructType(_elementType),
+        };
+    }
+
+    public IEnumerable<IEntity> GetMembers()
+    {
+        return BaseType.GetMembers();
+    }
+
+    public INamespace ParentNamespace
+    {
+        get {
+            return ElementType.ParentNamespace;
+        }
+    }
+
+    public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
+    {
+        return BaseType.Resolve(resultingSet, name, typesToConsider);
+    }
+
+    override public string ToString()
+    {
+        return this.DisplayName();
+    }
+
+    IGenericTypeInfo IType.GenericInfo
+    {
+        get {
+            return null;
+        }
+    }
+
+    IConstructedTypeInfo IType.ConstructedInfo
+    {
+        get {
+            return null;
+        }
+    }
+
+    #region IEntityWithAttributes Members
+
+    public bool IsDefined(IType attributeType)
+    {
+        return false;
+    }
+
+    #endregion
+
+    private ArrayTypeCache _arrayTypes;
+
+    public IArrayType MakeArrayType(int rank)
+    {
+        if (null == _arrayTypes)
+            _arrayTypes = new ArrayTypeCache(this);
+        return _arrayTypes.MakeArrayType(rank);
+    }
+
+    public IType MakePointerType()
+    {
+        return null;
+    }
+
+    public bool IsGenericType
+    {
+        get {
+            return false;
+        }
+    }
+
+    public IType GenericDefinition
+    {
+        get {
+            return null;
+        }
+    }
+}
 }
 

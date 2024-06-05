@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,157 +31,161 @@ using System.Reflection.Metadata;
 
 namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	class MetadataExternalProperty : MetadataExternalEntity<PropertyDefinition>, IProperty
-	{
-		private readonly MetadataExternalType _parent;
-		private readonly IType _type;
-		private readonly IMethod _getter;
-		private readonly IMethod _setter;
-		private IParameter[] _parameters;
+class MetadataExternalProperty : MetadataExternalEntity<PropertyDefinition>, IProperty
+{
+    private readonly MetadataExternalType _parent;
+    private readonly IType _type;
+    private readonly IMethod _getter;
+    private readonly IMethod _setter;
+    private IParameter[] _parameters;
 
-		public MetadataExternalProperty(
-			MetadataTypeSystemProvider provider,
-			PropertyDefinition pd,
-			MetadataExternalType parent,
-			MetadataReader reader)
-			: base(provider, pd, reader)
-		{
-			_parent = parent;
-			var gi = parent.GenericInfo;
-			var sig = pd.DecodeSignature(
-				new MetadataSignatureDecoder(provider, reader),
-				new MetadataGenericContext(gi == null ? null : gi.GenericParameters, null));
-			_type = sig.ReturnType;
-			var accessors = pd.GetAccessors();
-			if (!accessors.Getter.IsNil)
-				_getter = provider.Map(parent, reader.GetMethodDefinition(accessors.Getter));
-			if (!accessors.Setter.IsNil)
-				_setter = provider.Map(parent, reader.GetMethodDefinition(accessors.Setter));
-			_parameters = GetAccessor().GetParameters();
-		}
+    public MetadataExternalProperty(
+        MetadataTypeSystemProvider provider,
+        PropertyDefinition pd,
+        MetadataExternalType parent,
+        MetadataReader reader)
+        : base(provider, pd, reader)
+    {
+        _parent = parent;
+        var gi = parent.GenericInfo;
+        var sig = pd.DecodeSignature(
+                      new MetadataSignatureDecoder(provider, reader),
+                      new MetadataGenericContext(gi == null ? null : gi.GenericParameters, null));
+        _type = sig.ReturnType;
+        var accessors = pd.GetAccessors();
+        if (!accessors.Getter.IsNil)
+            _getter = provider.Map(parent, reader.GetMethodDefinition(accessors.Getter));
+        if (!accessors.Setter.IsNil)
+            _setter = provider.Map(parent, reader.GetMethodDefinition(accessors.Setter));
+        _parameters = GetAccessor().GetParameters();
+    }
 
-		public virtual IType DeclaringType
-		{
-			get
-			{
-				return _parent;
-			}
-		}
+    public virtual IType DeclaringType
+    {
+        get
+        {
+            return _parent;
+        }
+    }
 
-		public bool IsStatic
-		{
-			get
-			{
-				return GetAccessor().IsStatic;
-			}
-		}
+    public bool IsStatic
+    {
+        get
+        {
+            return GetAccessor().IsStatic;
+        }
+    }
 
-		public bool IsPublic
-		{
-			get
-			{
-				return GetAccessor().IsPublic;
-			}
-		}
+    public bool IsPublic
+    {
+        get
+        {
+            return GetAccessor().IsPublic;
+        }
+    }
 
-		public bool IsProtected
-		{
-			get
-			{
-				return GetAccessor().IsProtected;
-			}
-		}
+    public bool IsProtected
+    {
+        get
+        {
+            return GetAccessor().IsProtected;
+        }
+    }
 
-		public bool IsInternal
-		{
-			get
-			{
-				return GetAccessor().IsInternal;
-			}
-		}
+    public bool IsInternal
+    {
+        get
+        {
+            return GetAccessor().IsInternal;
+        }
+    }
 
-		public bool IsPrivate
-		{
-			get
-			{
-				return GetAccessor().IsPrivate;
-			}
-		}
+    public bool IsPrivate
+    {
+        get
+        {
+            return GetAccessor().IsPrivate;
+        }
+    }
 
-		override public EntityType EntityType
-		{
-			get
-			{
-				return EntityType.Property;
-			}
-		}
+    override public EntityType EntityType
+    {
+        get
+        {
+            return EntityType.Property;
+        }
+    }
 
-		public virtual IType Type
-		{
-			get
-			{
-				return _type;
-			}
-		}
+    public virtual IType Type
+    {
+        get
+        {
+            return _type;
+        }
+    }
 
-		public PropertyDefinition PropertyInfo
-		{
-			get
-			{
-				return _memberInfo;
-			}
-		}
+    public PropertyDefinition PropertyInfo
+    {
+        get
+        {
+            return _memberInfo;
+        }
+    }
 
-		public bool AcceptVarArgs
-		{
-			get
-			{
-				return false;
-			}
-		}
+    public bool AcceptVarArgs
+    {
+        get
+        {
+            return false;
+        }
+    }
 
-		protected override IType MemberType
-		{
-			get { return _type; }
-		}
+    protected override IType MemberType
+    {
+        get {
+            return _type;
+        }
+    }
 
-		public override string Name
-		{
-			get { return _reader.GetString(_memberInfo.Name); }
-		}
+    public override string Name
+    {
+        get {
+            return _reader.GetString(_memberInfo.Name);
+        }
+    }
 
-		public virtual IParameter[] GetParameters()
-		{
-			return _parameters;
-		}
+    public virtual IParameter[] GetParameters()
+    {
+        return _parameters;
+    }
 
-		public virtual IMethod GetGetMethod()
-		{
-			return _getter;
-		}
+    public virtual IMethod GetGetMethod()
+    {
+        return _getter;
+    }
 
-		public virtual IMethod GetSetMethod()
-		{
-			return _setter;
-		}
+    public virtual IMethod GetSetMethod()
+    {
+        return _setter;
+    }
 
-		private IMethod GetAccessor()
-		{
-			return _getter ?? _setter;
-		}
+    private IMethod GetAccessor()
+    {
+        return _getter ?? _setter;
+    }
 
-		protected override string BuildFullName()
-		{
-			return _parent.FullName + "." + Name;
-		}
+    protected override string BuildFullName()
+    {
+        return _parent.FullName + "." + Name;
+    }
 
-		protected override bool HasAttribute(IType attr)
-		{
-			var coll = _memberInfo.GetCustomAttributes();
-			if (coll.Count == 0)
-				return false;
-			var attrs = _provider.GetCustomAttributeTypes(coll, _reader);
-			return attrs.Contains(attr);
-		}
-	}
+    protected override bool HasAttribute(IType attr)
+    {
+        var coll = _memberInfo.GetCustomAttributes();
+        if (coll.Count == 0)
+            return false;
+        var attrs = _provider.GetCustomAttributeTypes(coll, _reader);
+        return attrs.Contains(attr);
+    }
+}
 }

@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,88 +31,98 @@ using System.Diagnostics;
 
 namespace Boo.Lang.Compiler.TypeSystem.Core
 {
-	public class AnonymousCallableType : AbstractType, ICallableType
-	{
-		private readonly TypeSystemServices _typeSystemServices;
-		private readonly CallableSignature _signature;
-		IType _concreteType;
-		
-		internal AnonymousCallableType(TypeSystemServices services, CallableSignature signature)
-		{
-			_typeSystemServices = services;
-			_signature = signature;
-		}
-		
-		public IType ConcreteType
-		{
-			get { return _concreteType; }
-			
-			set
-			{
-				if (value == null || _concreteType != null) throw new InvalidOperationException();	
-				_concreteType = value;
-			}
-		}
-		
-		override public IType BaseType
-		{
-			get { return _typeSystemServices.MulticastDelegateType; }
-		}
-		
-		override public bool IsSubclassOf(IType other)
-		{			
-			return BaseType.IsSubclassOf(other) || other == BaseType ||
-				other == _typeSystemServices.ICallableType;				
-		}
-		
-		override public bool IsAssignableFrom(IType other)
-		{
-			return _typeSystemServices.IsCallableTypeAssignableFrom(this, other);
-		}
-		
-		public CallableSignature GetSignature()
-		{
-			return _signature;
-		}
+public class AnonymousCallableType : AbstractType, ICallableType
+{
+    private readonly TypeSystemServices _typeSystemServices;
+    private readonly CallableSignature _signature;
+    IType _concreteType;
 
-		public bool IsAnonymous
-		{
-			get { return true; }
-		}
+    internal AnonymousCallableType(TypeSystemServices services, CallableSignature signature)
+    {
+        _typeSystemServices = services;
+        _signature = signature;
+    }
 
-		override public string Name
-		{
-			get { return _signature.ToString();  }
-		}
-		
-		override public EntityType EntityType
-		{
-			get { return EntityType.Type; }
-		}
-		
-		override public int GetTypeDepth()
-		{
-			return 3;
-		}
+    public IType ConcreteType
+    {
+        get {
+            return _concreteType;
+        }
 
-		public bool IsGenericType
-		{
-			get
-			{
-				if (_concreteType == null)
-					throw new InvalidOperationException();
-				return _concreteType.IsGenericType;
-			}
-		}
+        set
+        {
+            if (value == null || _concreteType != null) throw new InvalidOperationException();
+            _concreteType = value;
+        }
+    }
 
-		public IType GenericDefinition
-		{
-			get
-			{
-				if (_concreteType == null)
-					throw new InvalidOperationException();
-				return _concreteType.GenericDefinition;
-			}
-		}
-	}
+    override public IType BaseType
+    {
+        get {
+            return _typeSystemServices.MulticastDelegateType;
+        }
+    }
+
+    override public bool IsSubclassOf(IType other)
+    {
+        return BaseType.IsSubclassOf(other) || other == BaseType ||
+               other == _typeSystemServices.ICallableType;
+    }
+
+    override public bool IsAssignableFrom(IType other)
+    {
+        return _typeSystemServices.IsCallableTypeAssignableFrom(this, other);
+    }
+
+    public CallableSignature GetSignature()
+    {
+        return _signature;
+    }
+
+    public bool IsAnonymous
+    {
+        get {
+            return true;
+        }
+    }
+
+    override public string Name
+    {
+        get {
+            return _signature.ToString();
+        }
+    }
+
+    override public EntityType EntityType
+    {
+        get {
+            return EntityType.Type;
+        }
+    }
+
+    override public int GetTypeDepth()
+    {
+        return 3;
+    }
+
+    public bool IsGenericType
+    {
+        get
+        {
+            if (_concreteType == null)
+                throw new InvalidOperationException();
+            return _concreteType.IsGenericType;
+        }
+    }
+
+    public IType GenericDefinition
+    {
+        get
+        {
+            if (_concreteType == null)
+                throw new InvalidOperationException();
+            return _concreteType.GenericDefinition;
+        }
+    }
+}
 }

@@ -1,10 +1,10 @@
 #region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -38,346 +38,376 @@ using Boo.Lang.Environments;
 
 namespace Boo.Lang.Compiler
 {
-	public class CompilerContext
-	{
-		public static CompilerContext Current
-		{
-			get { return ActiveEnvironment.Instance != null ? My<CompilerContext>.Instance : null; }
-		}
+public class CompilerContext
+{
+    public static CompilerContext Current
+    {
+        get {
+            return ActiveEnvironment.Instance != null ? My<CompilerContext>.Instance : null;
+        }
+    }
 
-		private readonly CompilerParameters _parameters;
+    private readonly CompilerParameters _parameters;
 
-		private readonly CompileUnit _unit;
+    private readonly CompileUnit _unit;
 
-		private readonly CompilerReferenceCollection _references;
+    private readonly CompilerReferenceCollection _references;
 
-		private readonly CompilerErrorCollection _errors;
+    private readonly CompilerErrorCollection _errors;
 
-		private readonly CompilerWarningCollection _warnings;
+    private readonly CompilerWarningCollection _warnings;
 
-		private Assembly _generatedAssembly;
+    private Assembly _generatedAssembly;
 
-		private string _generatedAssemblyFileName;
+    private string _generatedAssemblyFileName;
 
-		private readonly Hash _properties;
-		
-		public CompilerContext() : this(new CompileUnit())
-		{
-		}
+    private readonly Hash _properties;
 
-		public CompilerContext(CompileUnit unit) : this(new CompilerParameters(), unit)
-		{
-		}
+    public CompilerContext() : this(new CompileUnit())
+    {
+    }
 
-		public CompilerContext(bool stdlib) : this(new CompilerParameters(stdlib), new CompileUnit())
-		{
-		}
-		
-		public CompilerContext(CompilerParameters options) : this(options, new CompileUnit())
-		{
-		}
-		
-		public CompilerContext(CompilerParameters options, CompileUnit unit)
-		{
-			if (null == options) throw new ArgumentNullException("options");
-			if (null == unit) throw new ArgumentNullException("unit");
+    public CompilerContext(CompileUnit unit) : this(new CompilerParameters(), unit)
+    {
+    }
 
-			_unit = unit;
-			_errors = new CompilerErrorCollection();
-			_warnings = new CompilerWarningCollection();
-			_warnings.Adding += OnCompilerWarning;
+    public CompilerContext(bool stdlib) : this(new CompilerParameters(stdlib), new CompileUnit())
+    {
+    }
 
-			_references = options.References;
-			_parameters = options;
+    public CompilerContext(CompilerParameters options) : this(options, new CompileUnit())
+    {
+    }
 
-			if (_parameters.Debug && !_parameters.Defines.ContainsKey("DEBUG"))
-				_parameters.Defines.Add("DEBUG", null);
+    public CompilerContext(CompilerParameters options, CompileUnit unit)
+    {
+        if (null == options) throw new ArgumentNullException("options");
+        if (null == unit) throw new ArgumentNullException("unit");
 
-			_properties = new Hash();
+        _unit = unit;
+        _errors = new CompilerErrorCollection();
+        _warnings = new CompilerWarningCollection();
+        _warnings.Adding += OnCompilerWarning;
 
-			var activator = new InstantiatingEnvironment();
-			_environment = _parameters.Environment != null
-				? new CachingEnvironment(new EnvironmentChain(_parameters.Environment, activator))
-				: new CachingEnvironment(activator);
-			_environment.InstanceCached += InitializeService;
+        _references = options.References;
+        _parameters = options;
 
-			// FIXME: temporary hack to make sure the singleton is visible
-			// using the My<IReflectionTypeSystemProvider> idiom
-			RegisterService<MetadataTypeSystemProvider>(_references.Provider);
-            RegisterService<CompilerParameters>(_parameters);
-			RegisterService<CompilerErrorCollection>(_errors);
-			RegisterService<CompilerWarningCollection>(_warnings);
-			RegisterService<CompileUnit>(_unit);
-            RegisterService<CompilerContext>(this);
-		}
+        if (_parameters.Debug && !_parameters.Defines.ContainsKey("DEBUG"))
+            _parameters.Defines.Add("DEBUG", null);
 
-		public IEnvironment Environment
-		{
-			get { return _environment;  }
-		}
+        _properties = new Hash();
 
-		public Hash Properties
-		{
-			get { return _properties; }
-		}
-		
-		public string GeneratedAssemblyFileName
-		{
-			get { return _generatedAssemblyFileName; }
-			
-			set
-			{
-				if (string.IsNullOrEmpty(value))
-					throw new ArgumentNullException("value");
-				_generatedAssemblyFileName = value;
-			}
-		}
-		
-		public object this[object key]
-		{
-			get { return _properties[key]; }
-			
-			set { _properties[key] = value; }
-		}
+        var activator = new InstantiatingEnvironment();
+        _environment = _parameters.Environment != null
+                       ? new CachingEnvironment(new EnvironmentChain(_parameters.Environment, activator))
+                       : new CachingEnvironment(activator);
+        _environment.InstanceCached += InitializeService;
 
-		public CompilerParameters Parameters
-		{
-			get { return _parameters; }
-		}
+        // FIXME: temporary hack to make sure the singleton is visible
+        // using the My<IReflectionTypeSystemProvider> idiom
+        RegisterService<MetadataTypeSystemProvider>(_references.Provider);
+        RegisterService<CompilerParameters>(_parameters);
+        RegisterService<CompilerErrorCollection>(_errors);
+        RegisterService<CompilerWarningCollection>(_warnings);
+        RegisterService<CompileUnit>(_unit);
+        RegisterService<CompilerContext>(this);
+    }
 
-		public CompilerReferenceCollection References
-		{
-			get { return _references; }
-		}
+    public IEnvironment Environment
+    {
+        get {
+            return _environment;
+        }
+    }
 
-		public CompilerErrorCollection Errors
-		{
-			get { return _errors; }
-		}
-		
-		public CompilerWarningCollection Warnings
-		{
-			get { return _warnings; }
-		}
+    public Hash Properties
+    {
+        get {
+            return _properties;
+        }
+    }
 
-		public CompileUnit CompileUnit
-		{
-			get { return _unit; }
-		}
+    public string GeneratedAssemblyFileName
+    {
+        get {
+            return _generatedAssemblyFileName;
+        }
 
-		public BooCodeBuilder CodeBuilder
-		{
-			get { return _codeBuilder; }
-		}
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentNullException("value");
+            _generatedAssemblyFileName = value;
+        }
+    }
 
-		private EnvironmentProvision<BooCodeBuilder> _codeBuilder = new EnvironmentProvision<BooCodeBuilder>();
-		
-		public Assembly GeneratedAssembly
-		{
-			get { return _generatedAssembly; }
-			set { _generatedAssembly = value; }
-		}
+    public object this[object key]
+    {
+        get {
+            return _properties[key];
+        }
 
-		public string GetUniqueName(params string[] components)
-		{
-			return My<UniqueNameProvider>.Instance.GetUniqueName(components);
-		}
+        set {
+            _properties[key] = value;
+        }
+    }
 
-		[Conditional("TRACE")]
-		public void TraceEnter(string format, params object[] args)
-		{
-			if (_parameters.TraceInfo)
-			{
-				TraceLine(format, args);
-				IndentTraceOutput();
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceLeave(string format, params object[] args)
-		{
-			if (_parameters.TraceInfo)
-			{
-				DedentTraceOutput();
-				TraceLine(format, args);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceInfo(string format, params object[] args)
-		{			
-			if (_parameters.TraceInfo)
-			{
-				TraceLine(format, args);
-			}			
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceInfo(string message)
-		{
-			if (_parameters.TraceInfo)
-			{
-				TraceLine(message);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceWarning(string message)
-		{
-			if (_parameters.TraceWarning)
-			{
-				TraceLine(message);
-			}
-		}
+    public CompilerParameters Parameters
+    {
+        get {
+            return _parameters;
+        }
+    }
 
-		[Conditional("TRACE")]
-		public void TraceWarning(string message, params object[] args)
-		{
-			if (_parameters.TraceWarning)
-			{
-				TraceLine(message, args);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceVerbose(string format, params object[] args)
-		{
-			if (_parameters.TraceVerbose)
-			{
-				TraceLine(format, args);
-			}			
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceVerbose(string format, object param1, object param2)
-		{
-			if (_parameters.TraceVerbose)
-			{
-				TraceLine(format, param1, param2);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceVerbose(string format, object param1, object param2, object param3)
-		{
-			if (_parameters.TraceVerbose)
-			{
-				TraceLine(format, param1, param2, param3);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceVerbose(string format, object param)
-		{
-			if (_parameters.TraceVerbose)
-			{
-				TraceLine(format, param);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceVerbose(string message)
-		{
-			if (_parameters.TraceVerbose)
-			{
-				TraceLine(message);
-			}
-		}	
-		
-		[Conditional("TRACE")]
-		public void TraceError(string message, params object[] args)
-		{
-			if (_parameters.TraceError)
-			{
-				TraceLine(message, args);
-			}
-		}
-		
-		[Conditional("TRACE")]
-		public void TraceError(Exception x)
-		{
-			if (_parameters.TraceError)
-			{
-				TraceLine(x);
-			}
-		}
+    public CompilerReferenceCollection References
+    {
+        get {
+            return _references;
+        }
+    }
 
-		private void IndentTraceOutput()
-		{
-			_indentation++;
-		}
+    public CompilerErrorCollection Errors
+    {
+        get {
+            return _errors;
+        }
+    }
 
-		private void DedentTraceOutput()
-		{
-			_indentation--;
-		}
+    public CompilerWarningCollection Warnings
+    {
+        get {
+            return _warnings;
+        }
+    }
 
-		private int _indentation;
+    public CompileUnit CompileUnit
+    {
+        get {
+            return _unit;
+        }
+    }
 
-		private void TraceLine(object o)
-		{
-			WriteIndentation();
-			TraceWriter.WriteLine(o);
-		}
+    public BooCodeBuilder CodeBuilder
+    {
+        get {
+            return _codeBuilder;
+        }
+    }
 
-		private void WriteIndentation()
-		{
-			for (var i=0; i<_indentation; ++i) TraceWriter.Write('\t');
-		}
+    private EnvironmentProvision<BooCodeBuilder> _codeBuilder = new EnvironmentProvision<BooCodeBuilder>();
 
-		private TextWriter TraceWriter
-		{
-			get { return Console.Out; }
-		}
+    public Assembly GeneratedAssembly
+    {
+        get {
+            return _generatedAssembly;
+        }
+        set {
+            _generatedAssembly = value;
+        }
+    }
 
-		private void TraceLine(string format, params object[] args)
-		{
-			WriteIndentation();
-			TraceWriter.WriteLine(format, args);
-		}
+    public string GetUniqueName(params string[] components)
+    {
+        return My<UniqueNameProvider>.Instance.GetUniqueName(components);
+    }
 
-		private readonly CachingEnvironment _environment;
+    [Conditional("TRACE")]
+    public void TraceEnter(string format, params object[] args)
+    {
+        if (_parameters.TraceInfo)
+        {
+            TraceLine(format, args);
+            IndentTraceOutput();
+        }
+    }
 
-		///<summary>Registers a (new) compiler service.</summary>
-		///<typeparam name="T">The Type of the service to register. It must be a reference type.</typeparam>
-		///<param name="service">An instance of the service.</param>
-		///<exception cref="ArgumentException">Thrown when <typeparamref name="T"/> is already registered.</exception>
-		///<exception cref="ArgumentNullException">Thrown when <paramref name="service"/> is null.</exception>
-		///<remarks>Services are unregistered (and potentially disposed) when a pipeline has been ran.</remarks>
-		public void RegisterService<T>(T service) where T : class
-		{
-			if (null == service)
-				throw new ArgumentNullException("service");
+    [Conditional("TRACE")]
+    public void TraceLeave(string format, params object[] args)
+    {
+        if (_parameters.TraceInfo)
+        {
+            DedentTraceOutput();
+            TraceLine(format, args);
+        }
+    }
 
-			AddService(typeof(T), service);
-		}
+    [Conditional("TRACE")]
+    public void TraceInfo(string format, params object[] args)
+    {
+        if (_parameters.TraceInfo)
+        {
+            TraceLine(format, args);
+        }
+    }
 
-		private void AddService(Type serviceType, object service)
-		{
-			_environment.Add(serviceType, service);
-		}
+    [Conditional("TRACE")]
+    public void TraceInfo(string message)
+    {
+        if (_parameters.TraceInfo)
+        {
+            TraceLine(message);
+        }
+    }
 
-		private void InitializeService(object service)
-		{
-			TraceInfo("Compiler component '{0}' instantiated.", service);
+    [Conditional("TRACE")]
+    public void TraceWarning(string message)
+    {
+        if (_parameters.TraceWarning)
+        {
+            TraceLine(message);
+        }
+    }
 
-			var component = service as ICompilerComponent;
-			if (component == null)
-				return;
-			component.Initialize(this);
-		}
+    [Conditional("TRACE")]
+    public void TraceWarning(string message, params object[] args)
+    {
+        if (_parameters.TraceWarning)
+        {
+            TraceLine(message, args);
+        }
+    }
 
-		void OnCompilerWarning(object o, CompilerWarningEventArgs args)
-		{
-			CompilerWarning warning = args.Warning;
-			if (Parameters.NoWarn || Parameters.DisabledWarnings.Contains(warning.Code))
-				args.Cancel();
-			if (Parameters.WarnAsError || Parameters.WarningsAsErrors.Contains(warning.Code))
-			{
-				Errors.Add(new CompilerError(warning.Code, warning.LexicalInfo, warning.Message, null));
-				args.Cancel();
-			}
-		}
-	}
+    [Conditional("TRACE")]
+    public void TraceVerbose(string format, params object[] args)
+    {
+        if (_parameters.TraceVerbose)
+        {
+            TraceLine(format, args);
+        }
+    }
+
+    [Conditional("TRACE")]
+    public void TraceVerbose(string format, object param1, object param2)
+    {
+        if (_parameters.TraceVerbose)
+        {
+            TraceLine(format, param1, param2);
+        }
+    }
+
+    [Conditional("TRACE")]
+    public void TraceVerbose(string format, object param1, object param2, object param3)
+    {
+        if (_parameters.TraceVerbose)
+        {
+            TraceLine(format, param1, param2, param3);
+        }
+    }
+
+    [Conditional("TRACE")]
+    public void TraceVerbose(string format, object param)
+    {
+        if (_parameters.TraceVerbose)
+        {
+            TraceLine(format, param);
+        }
+    }
+
+    [Conditional("TRACE")]
+    public void TraceVerbose(string message)
+    {
+        if (_parameters.TraceVerbose)
+        {
+            TraceLine(message);
+        }
+    }
+
+    [Conditional("TRACE")]
+    public void TraceError(string message, params object[] args)
+    {
+        if (_parameters.TraceError)
+        {
+            TraceLine(message, args);
+        }
+    }
+
+    [Conditional("TRACE")]
+    public void TraceError(Exception x)
+    {
+        if (_parameters.TraceError)
+        {
+            TraceLine(x);
+        }
+    }
+
+    private void IndentTraceOutput()
+    {
+        _indentation++;
+    }
+
+    private void DedentTraceOutput()
+    {
+        _indentation--;
+    }
+
+    private int _indentation;
+
+    private void TraceLine(object o)
+    {
+        WriteIndentation();
+        TraceWriter.WriteLine(o);
+    }
+
+    private void WriteIndentation()
+    {
+        for (var i=0; i<_indentation; ++i) TraceWriter.Write('\t');
+    }
+
+    private TextWriter TraceWriter
+    {
+        get {
+            return Console.Out;
+        }
+    }
+
+    private void TraceLine(string format, params object[] args)
+    {
+        WriteIndentation();
+        TraceWriter.WriteLine(format, args);
+    }
+
+    private readonly CachingEnvironment _environment;
+
+    ///<summary>Registers a (new) compiler service.</summary>
+    ///<typeparam name="T">The Type of the service to register. It must be a reference type.</typeparam>
+    ///<param name="service">An instance of the service.</param>
+    ///<exception cref="ArgumentException">Thrown when <typeparamref name="T"/> is already registered.</exception>
+    ///<exception cref="ArgumentNullException">Thrown when <paramref name="service"/> is null.</exception>
+    ///<remarks>Services are unregistered (and potentially disposed) when a pipeline has been ran.</remarks>
+    public void RegisterService<T>(T service) where T : class
+    {
+        if (null == service)
+            throw new ArgumentNullException("service");
+
+        AddService(typeof(T), service);
+    }
+
+    private void AddService(Type serviceType, object service)
+    {
+        _environment.Add(serviceType, service);
+    }
+
+    private void InitializeService(object service)
+    {
+        TraceInfo("Compiler component '{0}' instantiated.", service);
+
+        var component = service as ICompilerComponent;
+        if (component == null)
+            return;
+        component.Initialize(this);
+    }
+
+    void OnCompilerWarning(object o, CompilerWarningEventArgs args)
+    {
+        CompilerWarning warning = args.Warning;
+        if (Parameters.NoWarn || Parameters.DisabledWarnings.Contains(warning.Code))
+            args.Cancel();
+        if (Parameters.WarnAsError || Parameters.WarningsAsErrors.Contains(warning.Code))
+        {
+            Errors.Add(new CompilerError(warning.Code, warning.LexicalInfo, warning.Message, null));
+            args.Cancel();
+        }
+    }
+}
 }
 

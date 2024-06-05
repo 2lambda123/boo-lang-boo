@@ -1,10 +1,10 @@
 #region license
 // Copyright (c) 2003, 2004, 2005 Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,166 +34,168 @@ using Boo.Lang.Compiler.Util;
 
 namespace Boo.Lang.Compiler.TypeSystem.Reflection
 {
-	public class ReflectionTypeSystemProvider : IReflectionTypeSystemProvider
-	{
-		private readonly MemoizedFunction<Assembly, AssemblyReference> _referenceCache;
-		
-		public ReflectionTypeSystemProvider()
-		{
-			_referenceCache = new MemoizedFunction<Assembly, AssemblyReference>(AssemblyEqualityComparer.Default, CreateReference);
-			Initialize();
-		}
+public class ReflectionTypeSystemProvider : IReflectionTypeSystemProvider
+{
+    private readonly MemoizedFunction<Assembly, AssemblyReference> _referenceCache;
 
-		virtual protected void Initialize()
-		{
-			MapTo(typeof(object), new ObjectTypeImpl(this));
-			MapTo(typeof(Builtins.duck), new ObjectTypeImpl(this));
-			MapTo(typeof(void), new VoidTypeImpl(this));
-		}
+    public ReflectionTypeSystemProvider()
+    {
+        _referenceCache = new MemoizedFunction<Assembly, AssemblyReference>(AssemblyEqualityComparer.Default, CreateReference);
+        Initialize();
+    }
 
-		protected void MapTo(Type type, IType entity)
-		{
-			AssemblyReferenceFor(type.Assembly).MapTo(type, entity);
-		}
+    virtual protected void Initialize()
+    {
+        MapTo(typeof(object), new ObjectTypeImpl(this));
+        MapTo(typeof(Builtins.duck), new ObjectTypeImpl(this));
+        MapTo(typeof(void), new VoidTypeImpl(this));
+    }
 
-		private ReflectionTypeSystemProvider(MemoizedFunction<Assembly, AssemblyReference> referenceCache)
-		{
-			_referenceCache = referenceCache;
-		}
+    protected void MapTo(Type type, IType entity)
+    {
+        AssemblyReferenceFor(type.Assembly).MapTo(type, entity);
+    }
 
-		#region Implementation of ICompilerReferenceProvider
+    private ReflectionTypeSystemProvider(MemoizedFunction<Assembly, AssemblyReference> referenceCache)
+    {
+        _referenceCache = referenceCache;
+    }
 
-		public IAssemblyReference ForAssembly(Assembly assembly)
-		{
-			return AssemblyReferenceFor(assembly);
-		}
+    #region Implementation of ICompilerReferenceProvider
 
-		private AssemblyReference AssemblyReferenceFor(Assembly assembly)
-		{
-			return _referenceCache.Invoke(assembly);
-		}
+    public IAssemblyReference ForAssembly(Assembly assembly)
+    {
+        return AssemblyReferenceFor(assembly);
+    }
 
-		private AssemblyReference CreateReference(Assembly assembly)
-		{
-			return new AssemblyReference(this, assembly);
-		}
+    private AssemblyReference AssemblyReferenceFor(Assembly assembly)
+    {
+        return _referenceCache.Invoke(assembly);
+    }
 
-		#endregion
+    private AssemblyReference CreateReference(Assembly assembly)
+    {
+        return new AssemblyReference(this, assembly);
+    }
 
-		#region Implementation of IReflectionTypeSystemProvider
+    #endregion
 
-		public IType Map(Type type)
-		{
-			return AssemblyReferenceFor(type.Assembly).Map(type);
-		}
+    #region Implementation of IReflectionTypeSystemProvider
 
-		public IMethod Map(MethodInfo method)
-		{
-			return (IMethod) MapMember(method);
-		}
+    public IType Map(Type type)
+    {
+        return AssemblyReferenceFor(type.Assembly).Map(type);
+    }
 
-		public IConstructor Map(ConstructorInfo ctor)
-		{
-			return (IConstructor) MapMember(ctor);
-		}
+    public IMethod Map(MethodInfo method)
+    {
+        return (IMethod) MapMember(method);
+    }
 
-		public IEntity Map(MemberInfo mi)
-		{
-			return MapMember(mi);
-		}
+    public IConstructor Map(ConstructorInfo ctor)
+    {
+        return (IConstructor) MapMember(ctor);
+    }
 
-		public IParameter[] Map(ParameterInfo[] parameters)
-		{
-			var mapped = new IParameter[parameters.Length];
-			for (int i = 0; i < parameters.Length; ++i)
-			{
-				mapped[i] = new ExternalParameter(this, parameters[i]);
-			}
-			return mapped;
-		}
+    public IEntity Map(MemberInfo mi)
+    {
+        return MapMember(mi);
+    }
 
-		private IEntity MapMember(MemberInfo mi)
-		{
-			return AssemblyReferenceFor(mi.DeclaringType.Assembly).MapMember(mi);
-		}
+    public IParameter[] Map(ParameterInfo[] parameters)
+    {
+        var mapped = new IParameter[parameters.Length];
+        for (int i = 0; i < parameters.Length; ++i)
+        {
+            mapped[i] = new ExternalParameter(this, parameters[i]);
+        }
+        return mapped;
+    }
 
-		public virtual IReflectionTypeSystemProvider Clone()
-		{
-			return new ReflectionTypeSystemProvider(_referenceCache.Clone());
-		}
+    private IEntity MapMember(MemberInfo mi)
+    {
+        return AssemblyReferenceFor(mi.DeclaringType.Assembly).MapMember(mi);
+    }
 
-		public virtual IType CreateEntityForRegularType(Type type)
-		{
-			return new ExternalType(this, type);
-		}
+    public virtual IReflectionTypeSystemProvider Clone()
+    {
+        return new ReflectionTypeSystemProvider(_referenceCache.Clone());
+    }
 
-		public virtual IType CreateEntityForCallableType(Type type)
-		{
-			return new ExternalCallableType(this, type);
-		}
+    public virtual IType CreateEntityForRegularType(Type type)
+    {
+        return new ExternalType(this, type);
+    }
 
-		public IEntity Map(MemberInfo[] members)
-		{
-			switch (members.Length)
-			{
-				case 0:
-					return null;
-				case 1:
-					return Map(members[0]);
-				default:
-					var entities = new IEntity[members.Length];
-					for (int i = 0; i < entities.Length; ++i)
-						entities[i] = Map(members[i]);
-					return new Ambiguous(entities);
-			}
-		}
+    public virtual IType CreateEntityForCallableType(Type type)
+    {
+        return new ExternalCallableType(this, type);
+    }
 
-		#endregion
+    public IEntity Map(MemberInfo[] members)
+    {
+        switch (members.Length)
+        {
+        case 0:
+            return null;
+        case 1:
+            return Map(members[0]);
+        default:
+            var entities = new IEntity[members.Length];
+            for (int i = 0; i < entities.Length; ++i)
+                entities[i] = Map(members[i]);
+            return new Ambiguous(entities);
+        }
+    }
 
-		sealed class ObjectTypeImpl : ExternalType
-		{
-			internal ObjectTypeImpl(IReflectionTypeSystemProvider provider)
-				: base(provider, Types.Object)
-			{
-			}
+    #endregion
 
-			public override bool IsAssignableFrom(IType other)
-			{
-				var otherExternalType = other as ExternalType;
-				return otherExternalType == null || otherExternalType.ActualType != Types.Void;
-			}
-		}
+    sealed class ObjectTypeImpl : ExternalType
+    {
+        internal ObjectTypeImpl(IReflectionTypeSystemProvider provider)
+            : base(provider, Types.Object)
+        {
+        }
 
-		#region VoidTypeImpl
-		sealed class VoidTypeImpl : ExternalType
-		{
-			internal VoidTypeImpl(IReflectionTypeSystemProvider provider)
-				: base(provider, Types.Void)
-			{
-			}
+        public override bool IsAssignableFrom(IType other)
+        {
+            var otherExternalType = other as ExternalType;
+            return otherExternalType == null || otherExternalType.ActualType != Types.Void;
+        }
+    }
 
-			override public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
-			{
-				return false;
-			}
+    #region VoidTypeImpl
+    sealed class VoidTypeImpl : ExternalType
+    {
+        internal VoidTypeImpl(IReflectionTypeSystemProvider provider)
+            : base(provider, Types.Void)
+        {
+        }
 
-			override public bool IsSubclassOf(IType other)
-			{
-				return false;
-			}
+        override public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
+        {
+            return false;
+        }
 
-			override public bool IsAssignableFrom(IType other)
-			{
-				return false;
-			}
+        override public bool IsSubclassOf(IType other)
+        {
+            return false;
+        }
 
-			public override bool IsVoid
-			{
-				get { return true; }
-			}
-		}
+        override public bool IsAssignableFrom(IType other)
+        {
+            return false;
+        }
 
-		#endregion
+        public override bool IsVoid
+        {
+            get {
+                return true;
+            }
+        }
+    }
 
-	}
+    #endregion
+
+}
 }

@@ -1,10 +1,10 @@
 #region license
 // Copyright (c) 2003, 2004, 2005 Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -35,217 +35,269 @@ using Boo.Lang.Compiler.Util;
 
 namespace Boo.Lang.Compiler.TypeSystem.Generics
 {
-	public abstract class AbstractGenericParameter : IGenericParameter
-	{
-		TypeSystemServices _tss;
+public abstract class AbstractGenericParameter : IGenericParameter
+{
+    TypeSystemServices _tss;
 
-		protected AbstractGenericParameter(TypeSystemServices tss)
-		{
-			_tss = tss;
-		}
+    protected AbstractGenericParameter(TypeSystemServices tss)
+    {
+        _tss = tss;
+    }
 
-		abstract public int GenericParameterPosition { get; }
+    abstract public int GenericParameterPosition {
+        get;
+    }
 
-		abstract public bool MustHaveDefaultConstructor { get; }
+    abstract public bool MustHaveDefaultConstructor {
+        get;
+    }
 
-		abstract public Variance Variance { get; }
+    abstract public Variance Variance {
+        get;
+    }
 
-		abstract public bool IsClass { get; }
+    abstract public bool IsClass {
+        get;
+    }
 
-		abstract public bool IsValueType { get; }
+    abstract public bool IsValueType {
+        get;
+    }
 
-		abstract public IType[] GetTypeConstraints();
+    abstract public IType[] GetTypeConstraints();
 
-		abstract public IEntity DeclaringEntity { get; }
+    abstract public IEntity DeclaringEntity {
+        get;
+    }
 
-		protected IType DeclaringType
-		{
-			get
-			{
-				if (DeclaringEntity is IType)
-					return (IType)DeclaringEntity;
-				if (DeclaringEntity is IMethod)
-					return ((IMethod)DeclaringEntity).DeclaringType;
-				return null;
-			}
-		}
+    protected IType DeclaringType
+    {
+        get
+        {
+            if (DeclaringEntity is IType)
+                return (IType)DeclaringEntity;
+            if (DeclaringEntity is IMethod)
+                return ((IMethod)DeclaringEntity).DeclaringType;
+            return null;
+        }
+    }
 
-		protected IMethod DeclaringMethod 
-		{
-			get { return DeclaringEntity as IMethod; }
-		}
+    protected IMethod DeclaringMethod
+    {
+        get {
+            return DeclaringEntity as IMethod;
+        }
+    }
 
-		bool IType.IsAbstract
-		{
-			get { return false; }
-		}
-		
-		bool IType.IsInterface
-		{
-			get { return false; }
-		}
-		
-		bool IType.IsEnum
-		{
-			get { return false; }
-		}
-		
-		public bool IsByRef
-		{
-			get { return false; }
-		}
-		
-		bool IType.IsFinal
-		{
-			get { return true; }
-		}
-		
-		bool IType.IsArray
-		{
-			get { return false; }
-		}
+    bool IType.IsAbstract
+    {
+        get {
+            return false;
+        }
+    }
 
-		bool IType.IsPointer
-		{
-			get { return false; }
-		}
+    bool IType.IsInterface
+    {
+        get {
+            return false;
+        }
+    }
 
-		public virtual bool IsVoid
-		{
-			get { return false; }
-		}
+    bool IType.IsEnum
+    {
+        get {
+            return false;
+        }
+    }
 
-		public int GetTypeDepth()
-		{
-			return DeclaringType.GetTypeDepth() + 1;
-		}
+    public bool IsByRef
+    {
+        get {
+            return false;
+        }
+    }
 
-		IType IType.ElementType
-		{
-			get { return null; }
-		}
+    bool IType.IsFinal
+    {
+        get {
+            return true;
+        }
+    }
 
-		public IType BaseType
-		{
-			get { return FindBaseType(); }
-		}
-		
-		public IEntity GetDefaultMember()
-		{
-			return null;
-		}
-		
-		public IType[] GetInterfaces()
-		{
-			return Array.FindAll(GetTypeConstraints(), type => type.IsInterface);
-		}
+    bool IType.IsArray
+    {
+        get {
+            return false;
+        }
+    }
 
-		public bool IsSubclassOf(IType other)
-		{
-			return (other == BaseType || BaseType.IsSubclassOf(other));
-		}
-		
-		public virtual bool IsAssignableFrom(IType other)
-		{
-			if (other == this)
-                return true;
-		
-			if (other.IsNull())
-				return IsClass;
+    bool IType.IsPointer
+    {
+        get {
+            return false;
+        }
+    }
 
-			var otherParameter = other as IGenericParameter;
-			if (otherParameter != null && Array.Exists(otherParameter.GetTypeConstraints(), constraint => TypeCompatibilityRules.IsAssignableFrom(this, constraint)))
-				return true;
+    public virtual bool IsVoid
+    {
+        get {
+            return false;
+        }
+    }
 
-			return false;
-		}
-		
-		IGenericTypeInfo IType.GenericInfo 
-		{ 
-			get { return null; } 
-		}
-		
-		IConstructedTypeInfo IType.ConstructedInfo 
-		{ 
-			get { return null; } 
-		}
+    public int GetTypeDepth()
+    {
+        return DeclaringType.GetTypeDepth() + 1;
+    }
 
-		abstract public string Name { get; }
+    IType IType.ElementType
+    {
+        get {
+            return null;
+        }
+    }
 
-		public string FullName 
-		{
-			get { return string.Format("{0}.{1}", DeclaringEntity.FullName, Name); }
-		}
-		
-		public EntityType EntityType
-		{
-			get { return EntityType.Type; }
-		}
-		
-		public IType Type
-		{
-			get { return this; }
-		}
-		
-		INamespace INamespace.ParentNamespace
-		{
-			get { return DeclaringType; }
-		}
-		
-		IEnumerable<IEntity> INamespace.GetMembers()
-		{
-			return NullNamespace.EmptyEntityArray;
-		}
-		
-		bool INamespace.Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
-		{
-			var resolved = false;
-			foreach (IType type in GetTypeConstraints())
-				resolved |= type.Resolve(resultingSet, name, typesToConsider);
-			resolved |= _tss.ObjectType.Resolve(resultingSet, name, typesToConsider);
-			return resolved;
-		}
-		
-		override public string ToString()
-		{
-			return Name;
-		}
+    public IType BaseType
+    {
+        get {
+            return FindBaseType();
+        }
+    }
 
-		bool IEntityWithAttributes.IsDefined(IType attributeType)
-		{
-			throw new NotImplementedException();
-		}
+    public IEntity GetDefaultMember()
+    {
+        return null;
+    }
 
-		protected IType FindBaseType()
-		{
-			foreach (IType type in GetTypeConstraints())
-				if (!type.IsInterface)
-					return type;
-			return _tss.ObjectType;
-		}
+    public IType[] GetInterfaces()
+    {
+        return Array.FindAll(GetTypeConstraints(), type => type.IsInterface);
+    }
 
-		private ArrayTypeCache _arrayTypes;
+    public bool IsSubclassOf(IType other)
+    {
+        return (other == BaseType || BaseType.IsSubclassOf(other));
+    }
 
-		public IArrayType MakeArrayType(int rank)
-		{
-			if (null == _arrayTypes)
-				_arrayTypes = new ArrayTypeCache(this);
-			return _arrayTypes.MakeArrayType(rank);
-		}
+    public virtual bool IsAssignableFrom(IType other)
+    {
+        if (other == this)
+            return true;
 
-		public IType MakePointerType()
-		{
-			return null;
-		}
+        if (other.IsNull())
+            return IsClass;
 
-		public bool IsGenericType
-		{
-			get { return false; }
-		}
+        var otherParameter = other as IGenericParameter;
+        if (otherParameter != null && Array.Exists(otherParameter.GetTypeConstraints(), constraint => TypeCompatibilityRules.IsAssignableFrom(this, constraint)))
+            return true;
 
-		public IType GenericDefinition
-		{
-			get { return null; }
-		}
-	}
+        return false;
+    }
+
+    IGenericTypeInfo IType.GenericInfo
+    {
+        get {
+            return null;
+        }
+    }
+
+    IConstructedTypeInfo IType.ConstructedInfo
+    {
+        get {
+            return null;
+        }
+    }
+
+    abstract public string Name {
+        get;
+    }
+
+    public string FullName
+    {
+        get {
+            return string.Format("{0}.{1}", DeclaringEntity.FullName, Name);
+        }
+    }
+
+    public EntityType EntityType
+    {
+        get {
+            return EntityType.Type;
+        }
+    }
+
+    public IType Type
+    {
+        get {
+            return this;
+        }
+    }
+
+    INamespace INamespace.ParentNamespace
+    {
+        get {
+            return DeclaringType;
+        }
+    }
+
+    IEnumerable<IEntity> INamespace.GetMembers()
+    {
+        return NullNamespace.EmptyEntityArray;
+    }
+
+    bool INamespace.Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
+    {
+        var resolved = false;
+        foreach (IType type in GetTypeConstraints())
+            resolved |= type.Resolve(resultingSet, name, typesToConsider);
+        resolved |= _tss.ObjectType.Resolve(resultingSet, name, typesToConsider);
+        return resolved;
+    }
+
+    override public string ToString()
+    {
+        return Name;
+    }
+
+    bool IEntityWithAttributes.IsDefined(IType attributeType)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected IType FindBaseType()
+    {
+        foreach (IType type in GetTypeConstraints())
+            if (!type.IsInterface)
+                return type;
+        return _tss.ObjectType;
+    }
+
+    private ArrayTypeCache _arrayTypes;
+
+    public IArrayType MakeArrayType(int rank)
+    {
+        if (null == _arrayTypes)
+            _arrayTypes = new ArrayTypeCache(this);
+        return _arrayTypes.MakeArrayType(rank);
+    }
+
+    public IType MakePointerType()
+    {
+        return null;
+    }
+
+    public bool IsGenericType
+    {
+        get {
+            return false;
+        }
+    }
+
+    public IType GenericDefinition
+    {
+        get {
+            return null;
+        }
+    }
+}
 }

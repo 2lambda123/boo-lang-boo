@@ -37,64 +37,82 @@ using Boo.Lang.Environments;
 
 namespace Boo.Lang.Compiler.TypeSystem.ReflectionMetadata
 {
-	class MetadataPointerType: MetadataExternalType, IType
-	{
-		private readonly MetadataExternalType _element;
+class MetadataPointerType: MetadataExternalType, IType
+{
+    private readonly MetadataExternalType _element;
 
-		public MetadataPointerType(MetadataTypeSystemProvider tss, MetadataExternalType element, MetadataReader reader)
-			: base(tss, element.ActualType, reader)
-		{
-			_element = element;
-		}
+    public MetadataPointerType(MetadataTypeSystemProvider tss, MetadataExternalType element, MetadataReader reader)
+        : base(tss, element.ActualType, reader)
+    {
+        _element = element;
+    }
 
-		public override IType ElementType
-		{
-			get { return _element; }
-		}
+    public override IType ElementType
+    {
+        get {
+            return _element;
+        }
+    }
 
-		public new bool IsPointer
-		{
-			get { return true; }
-		}
+    public new bool IsPointer
+    {
+        get {
+            return true;
+        }
+    }
 
-		public override bool IsClass
-		{
-			get { return false; }
-		}
+    public override bool IsClass
+    {
+        get {
+            return false;
+        }
+    }
 
-		public new bool IsAbstract
-		{
-			get { return false; }
-		}
+    public new bool IsAbstract
+    {
+        get {
+            return false;
+        }
+    }
 
-		public new bool IsInterface
-		{
-			get { return false; }
-		}
+    public new bool IsInterface
+    {
+        get {
+            return false;
+        }
+    }
 
-		public new bool IsEnum
-		{
-			get { return false; }
-		}
+    public new bool IsEnum
+    {
+        get {
+            return false;
+        }
+    }
 
-		public override bool IsValueType
-		{
-			get { return false; }
-		}
+    public override bool IsValueType
+    {
+        get {
+            return false;
+        }
+    }
 
-		public new int GetTypeDepth()
-		{
-			return _element.GetTypeDepth() + 1;
-		}
+    public new int GetTypeDepth()
+    {
+        return _element.GetTypeDepth() + 1;
+    }
 
-		public bool IsGenericType
-		{
-			get { return false; }
-		}
+    public bool IsGenericType
+    {
+        get {
+            return false;
+        }
+    }
 
-		public IType GenericDefinition
-		{
-			get { return null; }
-		}
-	}
+    public IType GenericDefinition
+    {
+        get {
+            return null;
+        }
+    }
+}
 }

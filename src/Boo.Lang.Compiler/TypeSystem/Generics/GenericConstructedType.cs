@@ -1,10 +1,10 @@
 #region license
 // Copyright (c) 2003, 2004, 2005 Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -38,371 +38,423 @@ using Boo.Lang.Environments;
 
 namespace Boo.Lang.Compiler.TypeSystem.Generics
 {
-	/// <summary>
-	/// A type constructed by supplying type parameters to a generic type, involving internal types.
-	/// </summary>
-	/// <remarks>
-	/// Constructed types constructed from an external generic type with external type arguments 
-	/// are themselves external, and are represented as ExternalType instances. All other cases
-	/// are represented by this type.
-	/// </remarks>
-	public class GenericConstructedType : IType, IConstructedTypeInfo
-	{
-		protected readonly IType _definition;
-		IType[] _arguments;
-		GenericMapping _genericMapping;
-		bool _fullyConstructed;
-        
-		string _fullName = null;
+/// <summary>
+/// A type constructed by supplying type parameters to a generic type, involving internal types.
+/// </summary>
+/// <remarks>
+/// Constructed types constructed from an external generic type with external type arguments
+/// are themselves external, and are represented as ExternalType instances. All other cases
+/// are represented by this type.
+/// </remarks>
+public class GenericConstructedType : IType, IConstructedTypeInfo
+{
+    protected readonly IType _definition;
+    IType[] _arguments;
+    GenericMapping _genericMapping;
+    bool _fullyConstructed;
 
-		public GenericConstructedType(IType definition, IType[] arguments)
-		{
-			_definition = definition;
-			_arguments = arguments;
-			_genericMapping = new InternalGenericMapping(this, arguments);
-			_fullyConstructed = IsFullyConstructed();
-		}
+    string _fullName = null;
 
-		protected bool IsFullyConstructed()
-		{
-			return GenericsServices.GetTypeGenerity(this) == 0;
-		}
+    public GenericConstructedType(IType definition, IType[] arguments)
+    {
+        _definition = definition;
+        _arguments = arguments;
+        _genericMapping = new InternalGenericMapping(this, arguments);
+        _fullyConstructed = IsFullyConstructed();
+    }
 
-		protected string BuildFullName()
-		{/*
-            var sb = new StringBuilder();
-		    sb.Append(_definition.FullName);
-		    sb.Append("[of ");
-		    for (var i = 0; i < _arguments.Length; ++i)
-		    {
-		        sb.Append(_arguments[i].FullName);
-		        if (i < _arguments.Length - 1)
-		            sb.Append(", ");
-		    }
-		    sb.Append("]");
-			return sb.ToString();
-		  */
-			return _definition.FullName;
-		}
+    protected bool IsFullyConstructed()
+    {
+        return GenericsServices.GetTypeGenerity(this) == 0;
+    }
 
-	    public override bool Equals(object other)
-	    {
-	        if (other == null)
-	            return false;
+    protected string BuildFullName()
+    {   /*
+           var sb = new StringBuilder();
+           sb.Append(_definition.FullName);
+           sb.Append("[of ");
+           for (var i = 0; i < _arguments.Length; ++i)
+           {
+               sb.Append(_arguments[i].FullName);
+               if (i < _arguments.Length - 1)
+                   sb.Append(", ");
+           }
+           sb.Append("]");
+        return sb.ToString();
+         */
+        return _definition.FullName;
+    }
 
-            if (other.GetType() != this.GetType())
-	            return false;
+    public override bool Equals(object other)
+    {
+        if (other == null)
+            return false;
 
-	        var otherType = (GenericConstructedType) other;
-	        if (otherType._definition != _definition)
-	            return false;
+        if (other.GetType() != this.GetType())
+            return false;
 
-	        for (var i = 0; i < _arguments.Length; ++i)
-	        {
-	            if (!_arguments[i].Equals(otherType._arguments[i]))
-	                return false;
-	        }
-	        return true;
-	    }
+        var otherType = (GenericConstructedType) other;
+        if (otherType._definition != _definition)
+            return false;
 
-		protected internal GenericMapping GenericMapping
-		{
-			get { return _genericMapping; }
-		}
-
-		public IEntity DeclaringEntity
-		{
-			get { return _definition.DeclaringEntity;  }
-		}
-
-		public bool IsClass
-		{
-			get { return _definition.IsClass; }
-		}
-
-		public bool IsAbstract
-		{
-			get { return _definition.IsAbstract; }
-		}
-
-		public bool IsInterface
-		{
-			get { return _definition.IsInterface; }
-		}
-
-		public bool IsEnum
-		{
-			get { return _definition.IsEnum; }
-		}
-
-		public bool IsByRef
-		{
-			get { return _definition.IsByRef; }
-		}
-
-		public bool IsValueType
-		{
-			get { return _definition.IsValueType; }
-		}
-
-		public bool IsFinal
-		{
-			get { return _definition.IsFinal; }
-		}
-
-		public bool IsArray
-		{
-			get { return _definition.IsArray; }
-		}
-
-		public bool IsPointer
-		{
-			get { return _definition.IsPointer; }
-		}
-
-		public virtual bool IsVoid
-		{
-			get { return false; }
-		}
-
-		public int GetTypeDepth()
-		{
-			return _definition.GetTypeDepth();
-		}
-
-		public IType ElementType
-		{
-			get { return GenericMapping.MapType(_definition.ElementType); }
-		}
-
-		public IType BaseType
-		{
-			get { return GenericMapping.MapType(_definition.BaseType); }
-		}
-
-		public IEntity GetDefaultMember()
-		{
-			IEntity definitionDefaultMember = _definition.GetDefaultMember();
-			if (definitionDefaultMember != null) return GenericMapping.Map(definitionDefaultMember);
-			return null;
-		}
-
-		public IType[] GetInterfaces()
-		{
-			return Array.ConvertAll<IType, IType>(
-				_definition.GetInterfaces(), 
-				GenericMapping.MapType);
-		}
-
-		public bool IsSubclassOf(IType other)
-		{
-			if (null == other)
-				return false;
-
-			if (BaseType != null && (BaseType == other || BaseType.IsSubclassOf(other)))
-			{
-				return true;
-			}
-
-			if (other.IsInterface && Array.Exists(
-			                         	GetInterfaces(),
-			                         	i => TypeCompatibilityRules.IsAssignableFrom(other, i)))
-			{
-				return true;
-			}
-
-			if (null != other.ConstructedInfo
-			    && ConstructedInfo.GenericDefinition == other.ConstructedInfo.GenericDefinition)
-			{
-				for (int i = 0; i < ConstructedInfo.GenericArguments.Length; ++i)
-				{
-					if (!ConstructedInfo.GenericArguments[i].IsSubclassOf(other.ConstructedInfo.GenericArguments[i]))
-						return false;
-				}
-				return true;
-			}
-
-			return false;
-		}
-
-		public virtual bool IsAssignableFrom(IType other)
-		{
-			if (other == null)
-				return false;
-
-            if (other == this || other.IsSubclassOf(this) || (other.IsNull() && !IsValueType) || IsGenericAssignableFrom(other))
-				return true;
-
-			return false;
-		}
-
-        public bool IsGenericAssignableFrom(IType other)
+        for (var i = 0; i < _arguments.Length; ++i)
         {
-            var gd = _definition;
-            if (gd != null && gd.IsAssignableFrom(other))
-                return true;
-            var otherConstruct = other as GenericConstructedType;
-            if (otherConstruct == null || otherConstruct._definition != gd)
+            if (!_arguments[i].Equals(otherType._arguments[i]))
                 return false;
-            for (var i = 0; i < _arguments.Length; ++i)
+        }
+        return true;
+    }
+
+    protected internal GenericMapping GenericMapping
+    {
+        get {
+            return _genericMapping;
+        }
+    }
+
+    public IEntity DeclaringEntity
+    {
+        get {
+            return _definition.DeclaringEntity;
+        }
+    }
+
+    public bool IsClass
+    {
+        get {
+            return _definition.IsClass;
+        }
+    }
+
+    public bool IsAbstract
+    {
+        get {
+            return _definition.IsAbstract;
+        }
+    }
+
+    public bool IsInterface
+    {
+        get {
+            return _definition.IsInterface;
+        }
+    }
+
+    public bool IsEnum
+    {
+        get {
+            return _definition.IsEnum;
+        }
+    }
+
+    public bool IsByRef
+    {
+        get {
+            return _definition.IsByRef;
+        }
+    }
+
+    public bool IsValueType
+    {
+        get {
+            return _definition.IsValueType;
+        }
+    }
+
+    public bool IsFinal
+    {
+        get {
+            return _definition.IsFinal;
+        }
+    }
+
+    public bool IsArray
+    {
+        get {
+            return _definition.IsArray;
+        }
+    }
+
+    public bool IsPointer
+    {
+        get {
+            return _definition.IsPointer;
+        }
+    }
+
+    public virtual bool IsVoid
+    {
+        get {
+            return false;
+        }
+    }
+
+    public int GetTypeDepth()
+    {
+        return _definition.GetTypeDepth();
+    }
+
+    public IType ElementType
+    {
+        get {
+            return GenericMapping.MapType(_definition.ElementType);
+        }
+    }
+
+    public IType BaseType
+    {
+        get {
+            return GenericMapping.MapType(_definition.BaseType);
+        }
+    }
+
+    public IEntity GetDefaultMember()
+    {
+        IEntity definitionDefaultMember = _definition.GetDefaultMember();
+        if (definitionDefaultMember != null) return GenericMapping.Map(definitionDefaultMember);
+        return null;
+    }
+
+    public IType[] GetInterfaces()
+    {
+        return Array.ConvertAll<IType, IType>(
+                   _definition.GetInterfaces(),
+                   GenericMapping.MapType);
+    }
+
+    public bool IsSubclassOf(IType other)
+    {
+        if (null == other)
+            return false;
+
+        if (BaseType != null && (BaseType == other || BaseType.IsSubclassOf(other)))
+        {
+            return true;
+        }
+
+        if (other.IsInterface && Array.Exists(
+                    GetInterfaces(),
+                    i => TypeCompatibilityRules.IsAssignableFrom(other, i)))
+        {
+            return true;
+        }
+
+        if (null != other.ConstructedInfo
+                && ConstructedInfo.GenericDefinition == other.ConstructedInfo.GenericDefinition)
+        {
+            for (int i = 0; i < ConstructedInfo.GenericArguments.Length; ++i)
             {
-                if (!_arguments[i].IsAssignableFrom(otherConstruct._arguments[i]))
+                if (!ConstructedInfo.GenericArguments[i].IsSubclassOf(other.ConstructedInfo.GenericArguments[i]))
                     return false;
             }
             return true;
         }
-	
 
-		public IGenericTypeInfo GenericInfo
-		{
-			get { return _definition.GenericInfo; }
-		}
+        return false;
+    }
 
-		public IConstructedTypeInfo ConstructedInfo
-		{
-			get { return this; }
-		}
+    public virtual bool IsAssignableFrom(IType other)
+    {
+        if (other == null)
+            return false;
 
-		public IType Type
-		{
-			get { return this; }
-		}
+        if (other == this || other.IsSubclassOf(this) || (other.IsNull() && !IsValueType) || IsGenericAssignableFrom(other))
+            return true;
 
-		public INamespace ParentNamespace
-		{
-			get 
-			{              
-				return GenericMapping.Map(_definition.ParentNamespace as IEntity) as INamespace; 
-			}
-		}
+        return false;
+    }
 
-		public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
-		{
-			Set<IEntity> definitionMatches = new Set<IEntity>();
-			if (!_definition.Resolve(definitionMatches, name, typesToConsider))
-				return false;
-			foreach (IEntity match in definitionMatches)
-				resultingSet.Add(GenericMapping.Map(match));
-			return true;
-		}
+    public bool IsGenericAssignableFrom(IType other)
+    {
+        var gd = _definition;
+        if (gd != null && gd.IsAssignableFrom(other))
+            return true;
+        var otherConstruct = other as GenericConstructedType;
+        if (otherConstruct == null || otherConstruct._definition != gd)
+            return false;
+        for (var i = 0; i < _arguments.Length; ++i)
+        {
+            if (!_arguments[i].IsAssignableFrom(otherConstruct._arguments[i]))
+                return false;
+        }
+        return true;
+    }
 
-		public IEnumerable<IEntity> GetMembers()
-		{
-			return _definition.GetMembers().Select<IEntity, IEntity>(GenericMapping.Map);
-		}
 
-		public string Name
-		{
-			get { return _definition.Name; }
-		}
+    public IGenericTypeInfo GenericInfo
+    {
+        get {
+            return _definition.GenericInfo;
+        }
+    }
 
-		public string FullName
-		{
-			get { return _fullName ?? (_fullName = BuildFullName()); }
-		}
+    public IConstructedTypeInfo ConstructedInfo
+    {
+        get {
+            return this;
+        }
+    }
 
-		public EntityType EntityType
-		{
-			get { return EntityType.Type; }
-		}
+    public IType Type
+    {
+        get {
+            return this;
+        }
+    }
 
-		IType[] IGenericArgumentsProvider.GenericArguments
-		{
-			get { return _arguments; }
-		}
+    public INamespace ParentNamespace
+    {
+        get
+        {
+            return GenericMapping.Map(_definition.ParentNamespace as IEntity) as INamespace;
+        }
+    }
 
-		IType IConstructedTypeInfo.GenericDefinition
-		{
-			get { return _definition; }
-		}
+    public bool Resolve(ICollection<IEntity> resultingSet, string name, EntityType typesToConsider)
+    {
+        Set<IEntity> definitionMatches = new Set<IEntity>();
+        if (!_definition.Resolve(definitionMatches, name, typesToConsider))
+            return false;
+        foreach (IEntity match in definitionMatches)
+            resultingSet.Add(GenericMapping.Map(match));
+        return true;
+    }
 
-		bool IConstructedTypeInfo.FullyConstructed
-		{
-			get { return _fullyConstructed; }
-		}
+    public IEnumerable<IEntity> GetMembers()
+    {
+        return _definition.GetMembers().Select<IEntity, IEntity>(GenericMapping.Map);
+    }
 
-		IType IConstructedTypeInfo.Map(IType type)
-		{
-			return GenericMapping.MapType(type);
-		}
+    public string Name
+    {
+        get {
+            return _definition.Name;
+        }
+    }
 
-		IMember IConstructedTypeInfo.Map(IMember member)
-		{
-			return (IMember)GenericMapping.Map(member);
-		}
+    public string FullName
+    {
+        get {
+            return _fullName ?? (_fullName = BuildFullName());
+        }
+    }
 
-		IMember IConstructedTypeInfo.UnMap(IMember mapped)
-		{
-			return GenericMapping.UnMap(mapped);
-		}
+    public EntityType EntityType
+    {
+        get {
+            return EntityType.Type;
+        }
+    }
 
-		public bool IsDefined(IType attributeType)
-		{
-			return _definition.IsDefined(GenericMapping.MapType(attributeType));
-		}
+    IType[] IGenericArgumentsProvider.GenericArguments
+    {
+        get {
+            return _arguments;
+        }
+    }
 
-		public override string ToString()
-		{
-			return FullName;
-		}
+    IType IConstructedTypeInfo.GenericDefinition
+    {
+        get {
+            return _definition;
+        }
+    }
 
-		private ArrayTypeCache _arrayTypes;
+    bool IConstructedTypeInfo.FullyConstructed
+    {
+        get {
+            return _fullyConstructed;
+        }
+    }
 
-		public IArrayType MakeArrayType(int rank)
-		{
-			if (null == _arrayTypes)
-				_arrayTypes = new ArrayTypeCache(this);
-			return _arrayTypes.MakeArrayType(rank);
-		}
+    IType IConstructedTypeInfo.Map(IType type)
+    {
+        return GenericMapping.MapType(type);
+    }
 
-		public IType MakePointerType()
-		{
-			return null;
-		}
+    IMember IConstructedTypeInfo.Map(IMember member)
+    {
+        return (IMember)GenericMapping.Map(member);
+    }
 
-		public bool IsGenericType
-		{
-			get { return true; }
-		}
+    IMember IConstructedTypeInfo.UnMap(IMember mapped)
+    {
+        return GenericMapping.UnMap(mapped);
+    }
 
-		public IType GenericDefinition
-		{
-			get { return _definition; }
-		}
-	}
+    public bool IsDefined(IType attributeType)
+    {
+        return _definition.IsDefined(GenericMapping.MapType(attributeType));
+    }
 
-	public class GenericConstructedCallableType : GenericConstructedType, ICallableType
-	{
-		CallableSignature _signature;
+    public override string ToString()
+    {
+        return FullName;
+    }
 
-		public GenericConstructedCallableType(ICallableType definition, IType[] arguments) 
-			: base(definition, arguments) 
-		{
-		}
+    private ArrayTypeCache _arrayTypes;
 
-		public CallableSignature GetSignature()
-		{
-			if (_signature == null)
-			{
-				CallableSignature definitionSignature = ((ICallableType)_definition).GetSignature();
-                
-				IParameter[] parameters = GenericMapping.MapParameters(definitionSignature.Parameters);
-				IType returnType = GenericMapping.MapType(definitionSignature.ReturnType);
-                
-				_signature = new CallableSignature(parameters, returnType);
-			}
+    public IArrayType MakeArrayType(int rank)
+    {
+        if (null == _arrayTypes)
+            _arrayTypes = new ArrayTypeCache(this);
+        return _arrayTypes.MakeArrayType(rank);
+    }
 
-			return _signature;
-		}
+    public IType MakePointerType()
+    {
+        return null;
+    }
 
-		public bool IsAnonymous
-		{
-			get { return false; }
-		}
+    public bool IsGenericType
+    {
+        get {
+            return true;
+        }
+    }
 
-		override public bool IsAssignableFrom(IType other)
-		{
-			return My<TypeSystemServices>.Instance.IsCallableTypeAssignableFrom(this, other);
-		}
-	}
+    public IType GenericDefinition
+    {
+        get {
+            return _definition;
+        }
+    }
+}
+
+public class GenericConstructedCallableType : GenericConstructedType, ICallableType
+{
+    CallableSignature _signature;
+
+    public GenericConstructedCallableType(ICallableType definition, IType[] arguments)
+        : base(definition, arguments)
+    {
+    }
+
+    public CallableSignature GetSignature()
+    {
+        if (_signature == null)
+        {
+            CallableSignature definitionSignature = ((ICallableType)_definition).GetSignature();
+
+            IParameter[] parameters = GenericMapping.MapParameters(definitionSignature.Parameters);
+            IType returnType = GenericMapping.MapType(definitionSignature.ReturnType);
+
+            _signature = new CallableSignature(parameters, returnType);
+        }
+
+        return _signature;
+    }
+
+    public bool IsAnonymous
+    {
+        get {
+            return false;
+        }
+    }
+
+    override public bool IsAssignableFrom(IType other)
+    {
+        return My<TypeSystemServices>.Instance.IsCallableTypeAssignableFrom(this, other);
+    }
+}
 }

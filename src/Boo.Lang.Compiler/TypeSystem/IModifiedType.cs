@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace Boo.Lang.Compiler.TypeSystem
 {
-	interface IModifiedType : IType
-	{
-		IType[] ModReqs { get;  }
+interface IModifiedType : IType
+{
+    IType[] ModReqs {
+        get;
+    }
 
-		IType[] ModOpts { get; }
-	}
+    IType[] ModOpts {
+        get;
+    }
+}
 }
