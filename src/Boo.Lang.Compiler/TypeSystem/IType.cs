@@ -27,6 +27,8 @@
 #endregion
 
 
+using Boo.Lang.Compiler.TypeSystem.Core;
+
 namespace Boo.Lang.Compiler.TypeSystem
 {
 	public interface IType : ITypedEntity, INamespace, IEntityWithAttributes
@@ -78,6 +80,8 @@ namespace Boo.Lang.Compiler.TypeSystem
 		IArrayType MakeArrayType(int rank);
 
 		IType MakePointerType();
+
+		IType MakeByRefType() => new ByRefType(this);
 	}
 }
 

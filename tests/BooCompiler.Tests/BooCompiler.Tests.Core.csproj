@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<OutputPath>..\build\</OutputPath>
+	  <AssemblyName>BooCompiler.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SmokeTest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="Moq" Version="4.18.1" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Boo.Lang.Compiler\Boo.Lang.Compiler Core.csproj" />
+	<ProjectReference Include="..\..\src\Boo.Lang.Parser\Boo.Lang.Parser.Core.csproj" />
+    <ProjectReference Include="..\..\src\Boo.Lang\Boo.Lang Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Boo.Lang.Extensions">
+      <HintPath>..\..\bin.core\Boo.Lang.Extensions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
