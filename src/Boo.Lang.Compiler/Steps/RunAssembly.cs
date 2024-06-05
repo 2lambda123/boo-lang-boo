@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,48 +33,48 @@ using System.Reflection.Metadata;
 
 namespace Boo.Lang.Compiler.Steps
 {
-	public class RunAssembly : AbstractCompilerStep
-	{
+public class RunAssembly : AbstractCompilerStep
+{
 #if NET
-		override public void Run()
-		{
-			if (Errors.Count > 0 || Context.GeneratedPEBuilder == null)
-				return;
-			var asm = Context.GetGeneratedAssembly();
-			var entryPoint = asm.GetEntryPoint();
-			CompilerContext.AssemblyLookup[asm.FullName] = asm;
-			if (entryPoint.GetParameters().Length == 1)
-				entryPoint.Invoke(null, new object[] { Array.Empty<string>() });
-			else
-				entryPoint.Invoke(null, null);
-		}
+    override public void Run()
+    {
+        if (Errors.Count > 0 || Context.GeneratedPEBuilder == null)
+            return;
+        var asm = Context.GetGeneratedAssembly();
+        var entryPoint = asm.GetEntryPoint();
+        CompilerContext.AssemblyLookup[asm.FullName] = asm;
+        if (entryPoint.GetParameters().Length == 1)
+            entryPoint.Invoke(null, new object[] { Array.Empty<string>() });
+        else
+            entryPoint.Invoke(null, null);
+    }
 #else
-		override public void Run()
-		{
-			if (Errors.Count > 0
-				|| CompilerOutputType.Library == Parameters.OutputType
-				|| Context.GeneratedAssembly == null)
-				return;
+    override public void Run()
+    {
+        if (Errors.Count > 0
+                || CompilerOutputType.Library == Parameters.OutputType
+                || Context.GeneratedAssembly == null)
+            return;
 
-			AppDomain.CurrentDomain.AssemblyResolve += ResolveGeneratedAssembly;
-			try
-			{
-				var entryPoint = Context.GeneratedAssembly.EntryPoint;
-				if (entryPoint.GetParameters().Length == 1)
-					entryPoint.Invoke(null, new object[] { Array.Empty<string>() });
-				else
-					entryPoint.Invoke(null, null);
-			}
-			finally
-			{
-				AppDomain.CurrentDomain.AssemblyResolve -= ResolveGeneratedAssembly;
-			}
-		}
+        AppDomain.CurrentDomain.AssemblyResolve += ResolveGeneratedAssembly;
+        try
+        {
+            var entryPoint = Context.GeneratedAssembly.EntryPoint;
+            if (entryPoint.GetParameters().Length == 1)
+                entryPoint.Invoke(null, new object[] { Array.Empty<string>() });
+            else
+                entryPoint.Invoke(null, null);
+        }
+        finally
+        {
+            AppDomain.CurrentDomain.AssemblyResolve -= ResolveGeneratedAssembly;
+        }
+    }
 
-        private Assembly ResolveGeneratedAssembly(object sender, ResolveEventArgs args)
-		{
-			return args.Name == Context.GeneratedAssembly.FullName ? Context.GeneratedAssembly : null;
-		}
+    private Assembly ResolveGeneratedAssembly(object sender, ResolveEventArgs args)
+    {
+        return args.Name == Context.GeneratedAssembly.FullName ? Context.GeneratedAssembly : null;
+    }
 #endif
-	}
+}
 }

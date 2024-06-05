@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,56 +30,56 @@ using Boo.Lang.Compiler.Steps;
 
 namespace Boo.Lang.Compiler.Pipelines
 {
-	public class Compile : ResolveExpressions
-	{
-		public Compile()
-		{
-			Add(new NestMultipleExceptionHandlers());
-			Add(new InjectImplicitBooleanConversions());
+public class Compile : ResolveExpressions
+{
+    public Compile()
+    {
+        Add(new NestMultipleExceptionHandlers());
+        Add(new InjectImplicitBooleanConversions());
 
-			Add(new ConstantFolding());
+        Add(new ConstantFolding());
 
-			Add(new CheckLiteralValues());
+        Add(new CheckLiteralValues());
 
-			Add(new OptimizeIterationStatements());
+        Add(new OptimizeIterationStatements());
 
-			Add(new BranchChecking());
+        Add(new BranchChecking());
 
-			Add(new VerifyExtensionMethods());
+        Add(new VerifyExtensionMethods());
 
-			Add(new CheckIdentifiers());
-			Add(new CheckSlicingExpressions());
-			Add(new StricterErrorChecking());
-			Add(new CheckAttributesUsage());
+        Add(new CheckIdentifiers());
+        Add(new CheckSlicingExpressions());
+        Add(new StricterErrorChecking());
+        Add(new CheckAttributesUsage());
 
-			Add(new ExpandDuckTypedExpressions());
+        Add(new ExpandDuckTypedExpressions());
 
-			Add(new ExpandComplexSlicingExpressions());
+        Add(new ExpandComplexSlicingExpressions());
 
-			Add(new ProcessAssignmentsToValueTypeMembers());
-			Add(new ExpandPropertiesAndEvents());
-			
-			Add(new CheckMembersProtectionLevel());
+        Add(new ProcessAssignmentsToValueTypeMembers());
+        Add(new ExpandPropertiesAndEvents());
 
-			Add(new NormalizeIterationStatements());
+        Add(new CheckMembersProtectionLevel());
 
-			Add(new ProcessSharedLocals());
-			Add(new ProcessClosures());
-			Add(new ProcessGeneratorsAndAsyncMethods());
-            Add(new DetectNotImplementedFeatureUsage());
+        Add(new NormalizeIterationStatements());
 
-			Add(new ExpandVarArgsMethodInvocations());
-			
-			Add(new InjectCallableConversions());
-			Add(new CallableTypeElision());
-			Add(new ImplementICallableOnCallableDefinitions());
+        Add(new ProcessSharedLocals());
+        Add(new ProcessClosures());
+        Add(new ProcessGeneratorsAndAsyncMethods());
+        Add(new DetectNotImplementedFeatureUsage());
 
-			Add(new RemoveDeadCode());
-			Add(new CheckNeverUsedMembers());
-			Add(new CacheRegularExpressionsInStaticFields());
+        Add(new ExpandVarArgsMethodInvocations());
 
-			// TODO:
-			//Add(new InjectCastsAndConversions());
-		}
-	}
+        Add(new InjectCallableConversions());
+        Add(new CallableTypeElision());
+        Add(new ImplementICallableOnCallableDefinitions());
+
+        Add(new RemoveDeadCode());
+        Add(new CheckNeverUsedMembers());
+        Add(new CacheRegularExpressionsInStaticFields());
+
+        // TODO:
+        //Add(new InjectCastsAndConversions());
+    }
+}
 }

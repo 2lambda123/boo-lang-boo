@@ -1,10 +1,10 @@
 #region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,75 +28,77 @@
 
 namespace BooCompiler.Tests
 {
-	using System;
-	using System.IO;
-	using System.Reflection;
-	using System.Xml.Serialization;
-	using Boo.Lang.Compiler.Ast;
-	using NUnit.Framework;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Xml.Serialization;
+using Boo.Lang.Compiler.Ast;
+using NUnit.Framework;
 
-	/// <summary>
-	/// Helper methods for testing the boo libraries.
-	/// </summary>
-	public class BooTestCaseUtil
-	{
-		public static string TestCasesPath
-		{
-			get { return Path.Combine(BasePath, "tests/testcases"); }
-		}
+/// <summary>
+/// Helper methods for testing the boo libraries.
+/// </summary>
+public class BooTestCaseUtil
+{
+    public static string TestCasesPath
+    {
+        get {
+            return Path.Combine(BasePath, "tests/testcases");
+        }
+    }
 
-		public static string BasePath
-		{
-			get
-			{
+    public static string BasePath
+    {
+        get
+        {
 #if NET
-				var codebase = new Uri(Assembly.GetExecutingAssembly().Location);
-				return new Uri(codebase, "../../..").LocalPath;
+            var codebase = new Uri(Assembly.GetExecutingAssembly().Location);
+            return new Uri(codebase, "../../..").LocalPath;
 #else
-				var codebase = new Uri(Assembly.GetExecutingAssembly().CodeBase);
-				return new Uri(codebase, "../..").LocalPath;
+            var codebase = new Uri(Assembly.GetExecutingAssembly().CodeBase);
+            return new Uri(codebase, "../..").LocalPath;
 #endif
-			}
-		}
+        }
+    }
 
-		public static string GetTestCasePath(string sample)
-		{
-			return Path.Combine(TestCasesPath, sample);
-		}
-		
-		public static void AssertEqualsByLine(string sample, string expected, string actual)
-		{
-			string[] eLines = expected.Split('\n');
-			string[] aLines = actual.Split('\n');
-			int lines = Math.Min(eLines.Length, aLines.Length);
+    public static string GetTestCasePath(string sample)
+    {
+        return Path.Combine(TestCasesPath, sample);
+    }
 
-			// pula a primeira linha (que contm a declarao
-			// <?xml... )
-			for (int i=1; i<lines; ++i)
-			{
-				Assert.AreEqual(eLines[i].Trim(), aLines[i].Trim(), "Line " + (i+1) + " in " + sample);
-			}
-			//Assertion.AssertEquals("Line count differs for sample " + sample, eLines.Length, aLines.Length);
-		}
+    public static void AssertEqualsByLine(string sample, string expected, string actual)
+    {
+        string[] eLines = expected.Split('\n');
+        string[] aLines = actual.Split('\n');
+        int lines = Math.Min(eLines.Length, aLines.Length);
 
-		public static void AssertEquals(string message, CompileUnit expected, CompileUnit actual)
-		{
-			AssertEqualsByLine(message, ToXmlString(expected), ToXmlString(actual));
-		}
+        // pula a primeira linha (que contm a declarao
+        // <?xml... )
+        for (int i=1; i<lines; ++i)
+        {
+            Assert.AreEqual(eLines[i].Trim(), aLines[i].Trim(), "Line " + (i+1) + " in " + sample);
+        }
+        //Assertion.AssertEquals("Line count differs for sample " + sample, eLines.Length, aLines.Length);
+    }
 
-		public static string ToXmlString(Node node)
-		{
-			StringWriter sw = new StringWriter();
-			new XmlSerializer(node.GetType()).Serialize(sw, node);
-			return sw.ToString();
-		}
+    public static void AssertEquals(string message, CompileUnit expected, CompileUnit actual)
+    {
+        AssertEqualsByLine(message, ToXmlString(expected), ToXmlString(actual));
+    }
 
-		public static string LoadSample(string fname)
-		{
-			using (StreamReader sr = File.OpenText(BooTestCaseUtil.GetTestCasePath(fname)))
-			{
-				return sr.ReadToEnd();
-			}
-		}
-	}
+    public static string ToXmlString(Node node)
+    {
+        StringWriter sw = new StringWriter();
+        new XmlSerializer(node.GetType()).Serialize(sw, node);
+        return sw.ToString();
+    }
+
+    public static string LoadSample(string fname)
+    {
+        using (StreamReader sr = File.OpenText(BooTestCaseUtil.GetTestCasePath(fname)))
+        {
+            return sr.ReadToEnd();
+        }
+    }
+}
 }

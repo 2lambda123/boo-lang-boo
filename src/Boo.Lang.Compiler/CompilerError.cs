@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,106 +32,110 @@ using Boo.Lang.Compiler.Ast;
 
 namespace Boo.Lang.Compiler
 {
-	/// <summary>
-	/// A compilation error.
-	/// </summary>
-	[Serializable]
-	public class CompilerError : ApplicationException
-	{
-		private readonly LexicalInfo _lexicalInfo;
-		private readonly string _code;
-		
-		public CompilerError(string code, LexicalInfo lexicalInfo, Exception cause, params object[] args) : base(ResourceManager.Format(code, args), cause)
-		{
-			if (null == lexicalInfo)
-				throw new ArgumentNullException("lexicalInfo");
-			_code = code;
-			_lexicalInfo = lexicalInfo;
-		}
-		
-		public CompilerError(string code, Exception cause, params object[] args) : this(code, LexicalInfo.Empty, cause, args)
-		{
-		}
-		
-		public CompilerError(string code, LexicalInfo lexicalInfo, params object[] args) : base(ResourceManager.Format(code, args))
-		{
-			if (null == lexicalInfo)
-				throw new ArgumentNullException("lexicalInfo");
-			_code = code;
-			_lexicalInfo = lexicalInfo;
-		}
-		
-		public CompilerError(string code, LexicalInfo lexicalInfo, string message, Exception cause) : base(message, cause)
-		{
-			if (null == lexicalInfo)
-				throw new ArgumentNullException("lexicalInfo");
-			_code = code;
-			_lexicalInfo = lexicalInfo;
-		}
-		
-		public CompilerError(LexicalInfo lexicalInfo, string message, Exception cause) : this("BCE0000", lexicalInfo, message, cause)
-		{
-		}
-		
-		public CompilerError(Node node, string message, Exception cause) : this(node.LexicalInfo, message, cause)
-		{
-		}
+/// <summary>
+/// A compilation error.
+/// </summary>
+[Serializable]
+public class CompilerError : ApplicationException
+{
+    private readonly LexicalInfo _lexicalInfo;
+    private readonly string _code;
 
-		public CompilerError(Node node, string message) : this(node, message, null)
-		{
-		}
+    public CompilerError(string code, LexicalInfo lexicalInfo, Exception cause, params object[] args) : base(ResourceManager.Format(code, args), cause)
+    {
+        if (null == lexicalInfo)
+            throw new ArgumentNullException("lexicalInfo");
+        _code = code;
+        _lexicalInfo = lexicalInfo;
+    }
 
-		public CompilerError(LexicalInfo data, string message) : this(data, message, null)
-		{
-		}
+    public CompilerError(string code, Exception cause, params object[] args) : this(code, LexicalInfo.Empty, cause, args)
+    {
+    }
 
-		public CompilerError(LexicalInfo data, Exception cause) : this(data, cause.Message, cause)
-		{
-		}
+    public CompilerError(string code, LexicalInfo lexicalInfo, params object[] args) : base(ResourceManager.Format(code, args))
+    {
+        if (null == lexicalInfo)
+            throw new ArgumentNullException("lexicalInfo");
+        _code = code;
+        _lexicalInfo = lexicalInfo;
+    }
 
-		public CompilerError(string message) : this(LexicalInfo.Empty, message, null)
-		{
-		}
+    public CompilerError(string code, LexicalInfo lexicalInfo, string message, Exception cause) : base(message, cause)
+    {
+        if (null == lexicalInfo)
+            throw new ArgumentNullException("lexicalInfo");
+        _code = code;
+        _lexicalInfo = lexicalInfo;
+    }
 
-		public string Code
-		{
-			get { return _code; }
-		}
+    public CompilerError(LexicalInfo lexicalInfo, string message, Exception cause) : this("BCE0000", lexicalInfo, message, cause)
+    {
+    }
 
-		public LexicalInfo LexicalInfo
-		{
-			get { return _lexicalInfo; }
-		}
+    public CompilerError(Node node, string message, Exception cause) : this(node.LexicalInfo, message, cause)
+    {
+    }
 
-		override public string ToString()
-		{
-			var sb = new StringBuilder();
-			if (_lexicalInfo.Line > 0)
-			{
-				sb.Append(_lexicalInfo);
-				sb.Append(": ");
-			}
-			sb.Append(_code);
-			sb.Append(": ");
-			sb.Append(_verbose ? base.ToString() : Message);
-			return sb.ToString();
-		}
+    public CompilerError(Node node, string message) : this(node, message, null)
+    {
+    }
 
-		public string ToString(bool verbose)
-		{
-			var saved = _verbose;
-			try
-			{
-				_verbose = _verbose || verbose;
-				return ToString();
-			}
-			finally
-			{
-				_verbose = saved;
-			}
-		}
+    public CompilerError(LexicalInfo data, string message) : this(data, message, null)
+    {
+    }
 
-		[ThreadStatic]
-		private static bool _verbose;
-	}
+    public CompilerError(LexicalInfo data, Exception cause) : this(data, cause.Message, cause)
+    {
+    }
+
+    public CompilerError(string message) : this(LexicalInfo.Empty, message, null)
+    {
+    }
+
+    public string Code
+    {
+        get {
+            return _code;
+        }
+    }
+
+    public LexicalInfo LexicalInfo
+    {
+        get {
+            return _lexicalInfo;
+        }
+    }
+
+    override public string ToString()
+    {
+        var sb = new StringBuilder();
+        if (_lexicalInfo.Line > 0)
+        {
+            sb.Append(_lexicalInfo);
+            sb.Append(": ");
+        }
+        sb.Append(_code);
+        sb.Append(": ");
+        sb.Append(_verbose ? base.ToString() : Message);
+        return sb.ToString();
+    }
+
+    public string ToString(bool verbose)
+    {
+        var saved = _verbose;
+        try
+        {
+            _verbose = _verbose || verbose;
+            return ToString();
+        }
+        finally
+        {
+            _verbose = saved;
+        }
+    }
+
+    [ThreadStatic]
+    private static bool _verbose;
+}
 }

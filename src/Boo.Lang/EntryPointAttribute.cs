@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Boo.Lang
 {
-    public class EntryPointAttribute : Attribute
-    {
-    }
+public class EntryPointAttribute : Attribute
+{
+}
 
-    public class EntryPointTypeAttribute : Attribute
-    {
-    }
+public class EntryPointTypeAttribute : Attribute
+{
+}
 }

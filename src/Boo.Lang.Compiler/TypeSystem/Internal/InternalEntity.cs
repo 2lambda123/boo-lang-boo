@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2003, 2004, 2005 Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,94 +31,114 @@ using Boo.Lang.Environments;
 
 namespace Boo.Lang.Compiler.TypeSystem.Internal
 {
-	public abstract class InternalEntity<T> : IInternalEntity, IEntityWithAttributes where T : TypeMember
-	{
-		protected readonly T _node;
-		private bool? _isExtension;
+public abstract class InternalEntity<T> : IInternalEntity, IEntityWithAttributes where T : TypeMember
+{
+    protected readonly T _node;
+    private bool? _isExtension;
 
-		protected InternalEntity(T node)
-		{
-			_node = node;
-		}
+    protected InternalEntity(T node)
+    {
+        _node = node;
+    }
 
-		public Node Node
-		{
-			get { return _node; }
-		}
+    public Node Node
+    {
+        get {
+            return _node;
+        }
+    }
 
-		public string Name
-		{
-			get { return _node.Name; }
-		}
+    public string Name
+    {
+        get {
+            return _node.Name;
+        }
+    }
 
-		public virtual string FullName
-		{
-			get { return _node.FullName; }
-		}
+    public virtual string FullName
+    {
+        get {
+            return _node.FullName;
+        }
+    }
 
-		public IType DeclaringType
-		{
-			get { return (IType)EntityFor(_node.DeclaringType); }
-		}
+    public IType DeclaringType
+    {
+        get {
+            return (IType)EntityFor(_node.DeclaringType);
+        }
+    }
 
-		private static IEntity EntityFor(TypeMember member)
-		{
-			return My<InternalTypeSystemProvider>.Instance.EntityFor(member);
-		}
+    private static IEntity EntityFor(TypeMember member)
+    {
+        return My<InternalTypeSystemProvider>.Instance.EntityFor(member);
+    }
 
-		public bool IsDefined(IType type)
-		{
-			return MetadataUtil.IsAttributeDefined(_node, type);
-		}
+    public bool IsDefined(IType type)
+    {
+        return MetadataUtil.IsAttributeDefined(_node, type);
+    }
 
-		public virtual bool IsStatic
-		{
-			get { return _node.IsStatic; }
-		}
+    public virtual bool IsStatic
+    {
+        get {
+            return _node.IsStatic;
+        }
+    }
 
-		public virtual bool IsPublic
-		{
-			get { return _node.IsPublic; }
-		}
+    public virtual bool IsPublic
+    {
+        get {
+            return _node.IsPublic;
+        }
+    }
 
-		public virtual bool IsProtected
-		{
-			get { return _node.IsProtected; }
-		}
+    public virtual bool IsProtected
+    {
+        get {
+            return _node.IsProtected;
+        }
+    }
 
-		public virtual bool IsPrivate
-		{
-			get { return _node.IsPrivate; }
-		}
+    public virtual bool IsPrivate
+    {
+        get {
+            return _node.IsPrivate;
+        }
+    }
 
-		public virtual bool IsInternal
-		{
-			get { return _node.IsInternal; }
-		}
+    public virtual bool IsInternal
+    {
+        get {
+            return _node.IsInternal;
+        }
+    }
 
-		public abstract EntityType EntityType
-		{
-			get;
-		}
+    public abstract EntityType EntityType
+    {
+        get;
+    }
 
-		public bool IsExtension
-		{
-			get
-			{
-				if (!_isExtension.HasValue)
-					_isExtension = IsClrExtension;
-				return _isExtension.Value;
-			}
-		}
+    public bool IsExtension
+    {
+        get
+        {
+            if (!_isExtension.HasValue)
+                _isExtension = IsClrExtension;
+            return _isExtension.Value;
+        }
+    }
 
-		private bool IsClrExtension
-		{
-			get { return IsAttributeDefined(Types.ClrExtensionAttribute); }
-		}
+    private bool IsClrExtension
+    {
+        get {
+            return IsAttributeDefined(Types.ClrExtensionAttribute);
+        }
+    }
 
-		protected bool IsAttributeDefined(System.Type attributeType)
-		{
-			return IsDefined(My<TypeSystemServices>.Instance.Map(attributeType));
-		}
-	}
+    protected bool IsAttributeDefined(System.Type attributeType)
+    {
+        return IsDefined(My<TypeSystemServices>.Instance.Map(attributeType));
+    }
+}
 }

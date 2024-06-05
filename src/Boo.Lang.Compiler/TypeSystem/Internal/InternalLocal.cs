@@ -1,10 +1,10 @@
 ﻿#region license
 // Copyright (c) 2004, Rodrigo B. de Oliveira (rbo@acm.org)
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
-// 
+//
 //     * Redistributions of source code must retain the above copyright notice,
 //     this list of conditions and the following disclaimer.
 //     * Redistributions in binary form must reproduce the above copyright notice,
@@ -13,7 +13,7 @@
 //     * Neither the name of Rodrigo B. de Oliveira nor the names of its
 //     contributors may be used to endorse or promote products derived from this
 //     software without specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,77 +31,105 @@ using System.Reflection.Metadata;
 using Boo.Lang.Compiler.Ast;
 
 namespace Boo.Lang.Compiler.TypeSystem.Internal
-{	
-	public class InternalLocal : AbstractLocalEntity, ILocalEntity, IInternalEntity
-	{		
-		Local _local;
-		
-		IType _type;
+{
+public class InternalLocal : AbstractLocalEntity, ILocalEntity, IInternalEntity
+{
+    Local _local;
 
-		private Declaration _originalDeclaration;
+    IType _type;
 
-		public InternalLocal(Local local, IType type)
-		{			
-			_local = local;
-			_type = type;
-			IsShared = false;
-		}
+    private Declaration _originalDeclaration;
 
-		public Node Node
-		{
-			get { return _local;  }
-		}
-		
-		public string Name
-		{
-			get { return _local.Name; }
-		}
-		
-		public string FullName
-		{
-			get { return _local.Name; }
-		}
-		
-		public EntityType EntityType
-		{
-			get { return EntityType.Local; }
-		}
-		
-		public bool IsPrivateScope
-		{
-			get { return _local.PrivateScope; }
-			
-			set { _local.PrivateScope = value; }
-		}
-		
-		public Local Local
-		{
-			get { return _local; }
-		}
-		
-		public IType Type
-		{
-			get { return _type; }
-		}
+    public InternalLocal(Local local, IType type)
+    {
+        _local = local;
+        _type = type;
+        IsShared = false;
+    }
 
-		public LocalBuilder LocalBuilder { get; set; }
+    public Node Node
+    {
+        get {
+            return _local;
+        }
+    }
 
-		public int LocalVariableIndex { get; set; }
+    public string Name
+    {
+        get {
+            return _local.Name;
+        }
+    }
 
-		public Declaration OriginalDeclaration
-		{
-			get { return _originalDeclaration;  }
-			set { _originalDeclaration = value; }
-		}
+    public string FullName
+    {
+        get {
+            return _local.Name;
+        }
+    }
 
-		public bool IsExplicit
-		{
-			get { return null != _originalDeclaration; }
-		}
+    public EntityType EntityType
+    {
+        get {
+            return EntityType.Local;
+        }
+    }
 
-		override public string ToString()
-		{
-			return string.Format("Local({0}, {1})", Name, Type);
-		}
-	}
+    public bool IsPrivateScope
+    {
+        get {
+            return _local.PrivateScope;
+        }
+
+        set {
+            _local.PrivateScope = value;
+        }
+    }
+
+    public Local Local
+    {
+        get {
+            return _local;
+        }
+    }
+
+    public IType Type
+    {
+        get {
+            return _type;
+        }
+    }
+
+    public LocalBuilder LocalBuilder {
+        get;
+        set;
+    }
+
+    public int LocalVariableIndex {
+        get;
+        set;
+    }
+
+    public Declaration OriginalDeclaration
+    {
+        get {
+            return _originalDeclaration;
+        }
+        set {
+            _originalDeclaration = value;
+        }
+    }
+
+    public bool IsExplicit
+    {
+        get {
+            return null != _originalDeclaration;
+        }
+    }
+
+    override public string ToString()
+    {
+        return string.Format("Local({0}, {1})", Name, Type);
+    }
+}
 }
