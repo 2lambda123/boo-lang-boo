@@ -13,12 +13,12 @@ if extensionAttribute is null:
 	return
 
 extensionAssembly = extensionAttribute.Assembly
-	
+
 library = [|
 	namespace ClrExtensions
-	
+
 	import System.Collections.Generic
-	
+
 	[System.Runtime.CompilerServices.ExtensionAttribute]
 	def ItemAt[of T](items as IEnumerable[of T], index as int):
 		for item in items:
@@ -29,12 +29,11 @@ library = [|
 code = [|
 	import ClrExtensions
 	import System.Collections.Generic
-	
+
 	ints = List[of int]((1,2,3))
 	strings = List[of string](("Avish", "Bamboo", "Cedric"))
-	
+
 	print ints.ItemAt(2)
 	print strings.ItemAt(2)
 |]
 compile(code, compile(library, extensionAssembly), extensionAssembly).GetEntryPoint().Invoke(null, (null,))
-

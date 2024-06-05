@@ -12,20 +12,20 @@ import Boo.Lang.Compiler.TypeSystem.Services
 
 interface IFoo:
 	def Bar()
-	
+
 class ImplementIFoo(AbstractVisitorCompilerStep):
-	
+
 	override def Run():
 		Visit(CompileUnit)
-		
+
 	override def LeaveClassDefinition(node as ClassDefinition):
 		impl = [|
 			class _($IFoo):
-				
+
 				struct Pair[of TFirst, TSecond]:
 					First as TFirst
 					Second as TSecond
-	
+
 				def Bar():
 					p = Pair[of int, string](First: 42, Second: "ltuae")
 					print p.GetType().IsValueType
@@ -33,11 +33,11 @@ class ImplementIFoo(AbstractVisitorCompilerStep):
 					print p.Second
 		|]
 		my(CodeReifier).MergeInto(node, impl)
-				
-	
+
+
 module = [|
 	import System
-	
+
 	class Foo:
 		pass
 |]

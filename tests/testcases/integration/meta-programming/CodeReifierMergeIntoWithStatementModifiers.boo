@@ -11,28 +11,28 @@ import Boo.Lang.Compiler.TypeSystem.Services
 
 interface IFoo:
 	def Bar(flag as bool)
-	
+
 class ImplementIFoo(AbstractVisitorCompilerStep):
-	
+
 	override def Run():
 		Visit(CompileUnit)
-		
+
 	override def LeaveClassDefinition(node as ClassDefinition):
 		impl = [|
 			class _($IFoo):
-					
+
 				private _count = 1
-	
+
 				def Bar(flag as bool):
 					raise "Foo.Bar($_count)" if flag
 					_count++
 		|]
 		my(CodeReifier).MergeInto(node, impl)
-				
-	
+
+
 module = [|
 	import System
-	
+
 	class Foo:
 		pass
 |]
@@ -52,4 +52,3 @@ try:
 	foo.Bar(true)
 except x:
 	print x.Message
-

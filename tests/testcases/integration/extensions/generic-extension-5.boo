@@ -9,4 +9,3 @@ def IsTypeFullName[of T](s as string):
 s = "System.String"
 assert s.IsTypeFullName[of string]()
 assert not s.IsTypeFullName[of int]()
-

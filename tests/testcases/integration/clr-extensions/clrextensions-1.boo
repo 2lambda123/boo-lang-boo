@@ -14,7 +14,7 @@ if extensionAttribute is null:
 
 library = [|
 	namespace ClrExtensions
-	
+
 	[System.Runtime.CompilerServices.ExtensionAttribute]
 	def Reverse(this as string):
 		return join(reversed(this), '')
@@ -22,7 +22,7 @@ library = [|
 
 code = [|
 	import ClrExtensions
-	
+
 	forward = "forward"
 	reverse = forward.Reverse()
 
@@ -33,4 +33,3 @@ code = [|
 	print reverse
 |]
 compile(code, compile(library, extensionAttribute.Assembly)).GetEntryPoint().Invoke(null, (null,))
-

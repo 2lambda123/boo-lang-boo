@@ -15,12 +15,12 @@
         <NeutralLanguage>en</NeutralLanguage>
         <Copyright>© Rodrigo Barreto de Oliveira</Copyright>
     </PropertyGroup>
-    
+
     <PropertyGroup Label="Versions">
         <Version>$([System.IO.File]::ReadAllText($(VersionFile)).Trim())</Version>
         <AssemblyVersion>2.$(Version)</AssemblyVersion>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="Exists('$(BooKeyFile)')">
         <SignAssembly>true</SignAssembly>
         <DelaySign>false</DelaySign>

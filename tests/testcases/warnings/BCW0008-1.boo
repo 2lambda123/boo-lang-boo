@@ -7,4 +7,3 @@ import System.Drawing
 
 b = SolidBrush(Color.Red)
 print b
-

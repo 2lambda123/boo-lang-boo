@@ -11,11 +11,11 @@ def compile(code as string, references, count as int):
 	compiler.Parameters.Pipeline = CompileToMemory()
 	for reference in references:
 		compiler.Parameters.References.Add(reference)
-	
+
 	result = compiler.Run()
 	assert len(result.Errors) == 0, result.Errors.ToString(true)
 	return result.GetGeneratedAssembly()
-	
+
 library1 = """
 class Foo:
 	override def ToString():
@@ -37,8 +37,3 @@ assert asm2 is not null
 bar = asm2.GetType("Bar")
 assert bar is not null
 assert "Foo! Bar!" == bar().ToString()
-
-
-
-
-

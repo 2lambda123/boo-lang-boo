@@ -74,4 +74,3 @@ speaker "Sarkozy":
 	#GUEULE #fires error
 
 #GUEULE #fires error
-

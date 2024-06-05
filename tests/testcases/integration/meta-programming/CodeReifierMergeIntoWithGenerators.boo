@@ -12,26 +12,26 @@ import Boo.Lang.Compiler.TypeSystem.Services
 
 interface IFoo:
 	def Bar() as string*
-	
+
 class ImplementIFoo(AbstractVisitorCompilerStep):
-	
+
 	override def Run():
 		Visit(CompileUnit)
-		
+
 	override def LeaveClassDefinition(node as ClassDefinition):
 		impl = [|
 			class _($IFoo):
-	
+
 				def Bar():
 					for i in range(1, 3):
 						yield "Foo.Bar($i)"
 		|]
 		my(CodeReifier).MergeInto(node, impl)
-				
-	
+
+
 module = [|
 	import System
-	
+
 	class Foo:
 		pass
 |]

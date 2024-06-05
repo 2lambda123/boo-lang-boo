@@ -8,7 +8,7 @@ import Boo.Lang.Compiler.MetaProgramming
 def GetComponent(type as System.Type):
 	print "GetComponent($type)"
 	return null
-	
+
 code = [|
 	import System
 	GetComponent(String)

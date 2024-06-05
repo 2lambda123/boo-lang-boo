@@ -24,4 +24,3 @@ print a or b
 c as long? = 10L
 d as long? = 20L
 print c or d #not using extension since type is 'long?' not 'int?'
-

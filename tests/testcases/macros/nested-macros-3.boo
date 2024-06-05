@@ -51,4 +51,3 @@ code = [|
 |]
 result = compile(code, typeof(OneMacro).Assembly)
 result.GetEntryPoint().Invoke(null, (null,))
-

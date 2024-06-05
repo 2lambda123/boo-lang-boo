@@ -12,28 +12,28 @@ import Boo.Lang.Compiler.TypeSystem.Services
 
 interface IFoo:
 	def Bar()
-	
+
 class ImplementIFoo(AbstractVisitorCompilerStep):
-	
+
 	override def Run():
 		Visit(CompileUnit)
-		
+
 	override def LeaveClassDefinition(node as ClassDefinition):
 		impl = [|
 			class _($IFoo):
-					
+
 				private _count = 1
-	
+
 				def Bar():
 					print "Foo.Bar($_count)"
 					_count++
 		|]
 		my(CodeReifier).MergeInto(node, impl)
-				
-	
+
+
 module = [|
 	import System
-	
+
 	class Foo:
 		pass
 |]
@@ -50,4 +50,3 @@ assert len(result.Errors) == 0, result.Errors.ToString(true)
 foo as IFoo = result.GetGeneratedAssembly().GetType("Foo")()
 foo.Bar()
 foo.Bar()
-

@@ -16,40 +16,39 @@ macro deferred:
 				return $initializer
 		|]
 		yield p
-		
+
 class OnceAttribute(AbstractAstAttribute):
 	override def Apply(node as Node):
 		method = node as Method
-		
+
 		prototype = [|
 			class _:
 				private cache = null
-				
+
 				def OldMethod():
 					$(method.Body)
 		|]
-		
+
 		method.Body = [|
 			if cache is not null: return cache
 			return cache = OldMethod()
 		|]
-		
+
 		method.DeclaringType.Members.Extend(prototype.Members)
-		
+
 code = [|
 	import System
-	
+
 	class Foo:
 		deferred Bar = Init(42)
-		
+
 	def Init(value):
 		print "Init($value)"
 		return value
-		
+
 	f = Foo()
 	print f.Bar
 	print f.Bar
 |]
 
-compile(code, typeof(OnceAttribute).Assembly).GetEntryPoint().Invoke(null, (null,))		
-
+compile(code, typeof(OnceAttribute).Assembly).GetEntryPoint().Invoke(null, (null,))

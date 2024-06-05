@@ -39,20 +39,20 @@ def compileWithDefines(module as Module, *defines as (string)):
 	result = compiler.Run(CompileUnit(module.CloneNode()))
 	assert len(result.Errors) == 0, result.Errors.ToString(true)
 	return result.GetGeneratedAssembly()
-	
+
 def runWithDefines(code as Module, *defines as (string)):
 	print "DEFINES:", join(defines, ', ')
 	return compileWithDefines(code, *defines).GetEntryPoint().Invoke(null, (null,))
-	
+
 macro printIfdef(expression as Expression):
 	yield [|
 		ifdef $expression:
 			print $(expression.ToCodeString())
 	|]
-	
+
 module = [|
 	import System
-	
+
 	printIfdef FOO
 	printIfdef BAR
 	printIfdef FOO and BAR

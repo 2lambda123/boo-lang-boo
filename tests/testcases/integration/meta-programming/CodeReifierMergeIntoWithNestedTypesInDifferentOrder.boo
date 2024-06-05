@@ -11,35 +11,35 @@ import Boo.Lang.Compiler.TypeSystem.Services
 
 interface IFoo:
 	def Bar() as string*
-	
+
 class ImplementIFoo(AbstractVisitorCompilerStep):
-	
+
 	override def Run():
 		Visit(CompileUnit)
-		
+
 	override def LeaveClassDefinition(node as ClassDefinition):
 		impl = [|
 			class _($IFoo):
-					
+
 				callable OrdinalGenerator() as Ordinal*
-	
+
 				def Bar():
 					generator as OrdinalGenerator = do:
 						yield Ordinal.First
 						yield Ordinal.Second
 					for item in generator():
 						yield item.ToString()
-						
+
 				enum Ordinal:
 					First
 					Second
 		|]
 		my(CodeReifier).MergeInto(node, impl)
-				
-	
+
+
 module = [|
 	import System
-	
+
 	class Foo:
 		pass
 |]

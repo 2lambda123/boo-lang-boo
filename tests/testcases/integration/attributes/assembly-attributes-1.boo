@@ -30,5 +30,3 @@ assert "bar" == description.Description
 
 key = asm.GetName().GetPublicKeyToken()
 assert key is null or 0 == len(key)
-
-

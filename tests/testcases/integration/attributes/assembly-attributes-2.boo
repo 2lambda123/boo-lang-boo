@@ -27,4 +27,3 @@ name = result.GetGeneratedAssembly().GetName()
 assert "test" == name.Name
 assert "1.0.0.0" == name.Version.ToString()
 assert name.GetPublicKeyToken() is not null, "AssemblyKeyFileAttribute must result in strongly named assembly"
-

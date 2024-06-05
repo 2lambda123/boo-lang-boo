@@ -29,4 +29,3 @@ code = [|
 |]
 result = compile(code, typeof(FooMacro).Assembly)
 result.GetEntryPoint().Invoke(null, (null,))
-

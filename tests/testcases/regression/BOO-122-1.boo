@@ -50,4 +50,3 @@ print("Level 4 cleared.")
 references = []
 for level in level1, level2, level3, level4:
 	references.Add(run(level, references))
-

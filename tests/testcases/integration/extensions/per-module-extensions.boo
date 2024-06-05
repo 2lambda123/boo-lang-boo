@@ -14,14 +14,14 @@ def makeModule(name as string):
 
 		[extension] def puts(this as string):
 			print $name, this
-			
+
 		class $name:
 			def run():
 				$name.puts()
 	|]
 	m.Name = name
 	return m
-	
+
 assembly = compile(CompileUnit(makeModule("m1"), makeModule("m2")))
 for m in "m1", "m2":
 	(assembly.GetType(m)() as duck).run()

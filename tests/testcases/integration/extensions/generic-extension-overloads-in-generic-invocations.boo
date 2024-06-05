@@ -29,5 +29,3 @@ Foo[of int?](p)
 Foo[of int?](p, null)
 p.Foo[of int?]()
 p.Foo[of int?](null)
-
-

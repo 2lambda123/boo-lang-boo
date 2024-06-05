@@ -7,7 +7,7 @@ import Boo.Lang.Compiler.IO
 import Boo.Lang.Compiler.Pipelines
 import System.Reflection
 
-def compile(name as string, code as string, reference as Assembly):	
+def compile(name as string, code as string, reference as Assembly):
 	compiler = BooCompiler()
 	compiler.Parameters.OutputType = CompilerOutputType.Library
 	compiler.Parameters.References.Add(reference) if reference
@@ -15,7 +15,7 @@ def compile(name as string, code as string, reference as Assembly):
 	compiler.Parameters.Pipeline = CompileToMemory()
 	return compiler.Run()
 
-code1 = """	
+code1 = """
 class Class:
   static def Method(arg as int):
     return "regular method"
