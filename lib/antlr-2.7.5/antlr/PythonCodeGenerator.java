@@ -376,7 +376,9 @@ public class PythonCodeGenerator extends CodeGenerator {
 	{
 	    // If debugging, create a new sempred vector for this grammar
 	    if (g.debuggingOutput)
-		semPreds = new Vector();
+		{
+		    semPreds = new Vector();
+		}
 
 	    setGrammar(g);
 	    if (!(grammar instanceof LexerGrammar)) {
@@ -524,7 +526,9 @@ public class PythonCodeGenerator extends CodeGenerator {
 
 	    // Generate the semantic predicate map for debugging
 	    if (grammar.debuggingOutput)
-		genSemPredMap();
+		{
+		    genSemPredMap();
+		}
 
 	    // Generate the bitsets used throughout the lexer
 	    genBitsets(bitsetsUsed, ((LexerGrammar)grammar).charVocabulary.size());
@@ -1812,7 +1816,9 @@ public class PythonCodeGenerator extends CodeGenerator {
 		// and that are not giant unicode sets.
 		if (createdLL1Switch && suitableForCaseExpression(alt)) {
 		    if (DEBUG_CODE_GENERATOR) 
-			System.out.println("ignoring alt because it was in the switch");
+			{
+			    System.out.println("ignoring alt because it was in the switch");
+			}
 		    continue;
 		}
 		String e;
@@ -2725,9 +2731,13 @@ public class PythonCodeGenerator extends CodeGenerator {
 	    // lexer rule default return value is the rule's token name
 	    // This is a horrible hack to support the built-in EOF lexer rule.
 	    if (s.getId().equals("mEOF"))
-		println("_ttype = EOF_TYPE");
+		{
+		    println("_ttype = EOF_TYPE");
+		}
 	    else
-		println("_ttype = " + s.getId().substring(1));
+		{
+		    println("_ttype = " + s.getId().substring(1));
+		}
 	    println("_saveIndex = 0");		// used for element! (so we can kill text matched for element)
 	}
 
@@ -2781,7 +2791,9 @@ public class PythonCodeGenerator extends CodeGenerator {
 	    Alternative alt = rblk.getAlternativeAt(0);
 	    String pred = alt.semPred;
 	    if (pred != null)
-		genSemPred(pred, currentRule.line);
+		{
+		    genSemPred(pred, currentRule.line);
+		}
 	    if (alt.synPred != null) 
 	    {
 		antlrTool.warning(
@@ -3205,7 +3217,9 @@ public class PythonCodeGenerator extends CodeGenerator {
 		    // a string literal
 		    StringLiteralSymbol sl = (StringLiteralSymbol)tm.getTokenSymbol(s);
 		    if (sl == null) 
-			antlrTool.panic("String literal " + s + " not in symbol table");
+			{
+			    antlrTool.panic("String literal " + s + " not in symbol table");
+			}
 
 		    if (sl.label != null) 
 		    {
@@ -3446,7 +3460,9 @@ public class PythonCodeGenerator extends CodeGenerator {
 	if (grammar instanceof LexerGrammar) {
 	    cs = charFormatter.literalChar(value);
 	    if(wrap)
-		cs = "u'" + cs + "'";
+		{
+		    cs = "u'" + cs + "'";
+		}
 	    return cs;
 	}
 
