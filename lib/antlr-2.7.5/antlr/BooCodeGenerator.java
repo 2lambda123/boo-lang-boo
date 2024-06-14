@@ -1452,6 +1452,12 @@ public class BooCodeGenerator extends CodeGenerator {
 		}
 	}
 
+	/**
+	 * Generates the body of the parser class based on the provided ParserGrammar.
+	 *
+	 * @param g the ParserGrammar object used to generate the parser body
+	 * @throws IOException if an I/O error occurs while setting up the output stream
+ 	*/
 	public void genBody(ParserGrammar g) throws IOException {
 		// Open the output stream for the parser and set the currentOutput
 		// SAS: moved file setup so subclass could do it (for VAJ interface)
