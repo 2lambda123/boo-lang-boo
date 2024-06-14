@@ -4684,7 +4684,9 @@ boolean first = true;
 		ns = StringUtils.stripFrontBack(ns,"\"","\"");
 		if( ns.length() > 2 &&
 			 !ns.substring(ns.length()-2, ns.length()).equals("::") )
-		ns += "::";
+		{
+		    ns += "::";
+		}
 		return ns;
 	}
 

@@ -1533,7 +1533,9 @@ public class BooCodeGenerator extends CodeGenerator {
 			String suffix = StringUtils.stripFrontBack(tsuffix.getText(), "\"",
 					"\"");
 			if (suffix != null)
-				print(", " + suffix); // must be an interface name
+				{
+				    print(", " + suffix);
+				} // must be an interface name
 													// for Boo
 		}
 		_println("):");

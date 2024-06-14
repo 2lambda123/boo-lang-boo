@@ -2908,9 +2908,13 @@ public class CSharpCodeGenerator extends CodeGenerator {
 			// lexer rule default return value is the rule's token name
 			// This is a horrible hack to support the built-in EOF lexer rule.
 			if (s.getId().equals("mEOF"))
-				println("_ttype = Token.EOF_TYPE;");
+				{
+				    println("_ttype = Token.EOF_TYPE;");
+				}
 			else
-				println("_ttype = " + s.getId().substring(1)+";");
+				{
+				    println("_ttype = " + s.getId().substring(1)+";");
+				}
 
 			// delay creation of _saveIndex until we need it OK?
             blockNestingLevel    = 1;
@@ -3892,7 +3896,9 @@ public class CSharpCodeGenerator extends CodeGenerator {
                                                     ActionTransInfo tInfo)
 	{
 		if ( actionStr==null || actionStr.length()==0 )
-			return null;
+			{
+			    return null;
+			}
 
         // The action trans info tells us (at the moment) whether an
         // assignment was done to the rule's tree root.
