@@ -1258,12 +1258,6 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("static const "+namespaceAntlr+"BitSet " + getBitsetName(i) + ";");
 		}
 	}
-	/** Generate the finish of a block, using a combination of the info
-	 * returned from genCommonBlock() and the action to perform when
-	 * no alts were taken
-	 * @param howToFinish The return of genCommonBlock()
-	 * @param noViableAction What to generate when no alt is taken
-	 */
 	private void genBlockFinish(CppBlockFinishingInfo howToFinish, String noViableAction)
 	{
 		if (howToFinish.needAnErrorClause &&
@@ -1957,16 +1951,6 @@ public class CppCodeGenerator extends CodeGenerator {
 	 * is generated.
 	 * If the grammar is a lexer, then generate alternatives in an order where
 	 * alternatives requiring deeper lookahead are generated first, and
-	 * EOF in the lookahead set reduces the depth of the lookahead.
-	 * @param blk The block to generate
-	 * @param noTestForSingle If true, then it does not generate a test for a single alternative.
-	 */
-	public CppBlockFinishingInfo genCommonBlock(
-		AlternativeBlock blk,
-		boolean noTestForSingle )
-	{
-		int nIF=0;
-		boolean createdLL1Switch = false;
 		int closingBracesOfIFSequence = 0;
 		CppBlockFinishingInfo finishingInfo = new CppBlockFinishingInfo();
 		if ( DEBUG_CODE_GENERATOR || DEBUG_CPP_CODE_GENERATOR ) System.out.println("genCommonBlk("+blk+")");
@@ -2551,7 +2535,6 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("try { // for error handling");
 			tabs++;
 		}
-	}
 	/** Generate a header that is common to all C++ files */
 	protected void genHeader(String fileName)
 	{
@@ -3982,6 +3965,13 @@ public class CppCodeGenerator extends CodeGenerator {
 			println("int _m" + blk.ID + " = mark();");
 		}
 
+	 /**
+	  * Method to generate a syntactic predicate.
+	  *
+	  * @param blk The SynPredBlock object
+	  * @param lookaheadExpr The lookahead expression
+	  * @throws RecognitionException if an error occurs during recognition
+ 	 */
 		// Once inside the try, assume synpred works unless exception caught
 		println("synPredMatched" + blk.ID + " = true;");
 		println("inputState->guessing++;");
@@ -4696,6 +4686,13 @@ boolean first = true;
 			 g instanceof TreeWalkerGrammar
 			)
 		{
+	/**
+	 * Removes leading and trailing quotes from the given namespace string and appends "::" if not already present at the end.
+	 *
+	 * @param ns the namespace string to be fixed
+	 * @return the fixed namespace string
+	 * @throws IllegalArgumentException if the input namespace is null
+ 	*/
 			/* RK: options also have to be added to Grammar.java and for options
 			 * on the file level entries have to be defined in
 			 * DefineGrammarSymbols.java and passed around via 'globals' in
