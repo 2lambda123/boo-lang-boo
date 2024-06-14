@@ -371,7 +371,12 @@ public class PythonCodeGenerator extends CodeGenerator {
 	}
     }
 
-    /** Generate the lexer Java file */
+	/**
+	 * Generates the lexer based on the provided LexerGrammar.
+	 *
+	 * @param g the LexerGrammar object to generate the lexer from
+	 * @throws IOException if an I/O error occurs during the generation process
+ 	*/
     public void gen(LexerGrammar g) throws IOException 
 	{
 	    // If debugging, create a new sempred vector for this grammar
@@ -852,9 +857,6 @@ public class PythonCodeGenerator extends CodeGenerator {
 
 	tabs = 0;
 	genHeaderMain(grammar);
-	// Close the parser output stream
-	currentOutput.close();
-	currentOutput = null;
     }
 
     /** Generate code for the given grammar element.
@@ -1634,17 +1636,14 @@ public class PythonCodeGenerator extends CodeGenerator {
 		_print(",");
 	}
 	_print("]:\n");
-    }
-
-    /**Generate common code for a block of alternatives; return a
-     * postscript that needs to be generated at the end of the
-     * block.  Other routines may append else-clauses and such for
-     * error checking before the postfix is generated.  If the
-     * grammar is a lexer, then generate alternatives in an order
-     * where alternatives requiring deeper lookahead are generated
-     * first, and EOF in the lookahead set reduces the depth of
-     * the lookahead.  @param blk The block to generate @param
-     * noTestForSingle If true, then it does not generate a test
+		/**
+		 * Generates common block for Python code generation.
+		 *
+		 * @param blk The AlternativeBlock to generate the common block for
+		 * @param noTestForSingle Flag indicating whether to skip test for single alternative
+		 * @return PythonBlockFinishingInfo containing finishing information
+		 * @throws SomeException if something goes wrong
+ 		*/
      * for a single alternative.
      */
     public PythonBlockFinishingInfo genCommonBlock(AlternativeBlock blk,
@@ -2006,7 +2005,13 @@ public class PythonCodeGenerator extends CodeGenerator {
     }
 
     /** Generate code to link an element reference into the AST */
-    private void genElementAST(AlternativeElement el) {
+		/**
+		 * This method generates the Abstract Syntax Tree (AST) for the given AlternativeElement.
+		 * It handles cases where trees are not being built but are in a tree walker.
+		 * It sets up labels and generates AST variables for unlabeled elements.
+		 *
+		 * @param el The AlternativeElement for which to generate the AST
+ 		*/
 	// handle case where you're not building trees, but are in tree walker.
 	// Just need to get labels set up.
 	if (grammar instanceof TreeWalkerGrammar && !grammar.buildAST) {
@@ -2631,22 +2636,14 @@ public class PythonCodeGenerator extends CodeGenerator {
 	// close method nextToken
 	tabs--;
 	//println("### <end of outer while>");
-	//println("### shall never be reached");
-	//println("assert 0");
-	//println("### <end of method nextToken>");
-    }
-
-    /** Gen a named rule block.
-     * ASTs are generated for each element of an alternative unless
-     * the rule or the alternative have a '!' modifier.
+    /**
+     * Generates a rule based on the provided RuleSymbol, startSymbol flag, and rule number.
      *
-     * If an alternative defeats the default tree construction, it
-     * must set <rule>_AST to the root of the returned AST.
-     *
-     * Each alternative that does automatic tree construction, builds
-     * up root and child list pointers in an ASTPair structure.
-     *
-     * A rule finishes by setting the returnAST variable from the
+     * @param s The RuleSymbol to generate the rule from
+     * @param startSymbol Flag indicating if the rule is a start symbol
+     * @param ruleNum The rule number
+     * @throws RecognitionException if an error occurs during recognition
+     */
      * ASTPair.
      *
      * @param rule The name of the rule to generate
@@ -3184,7 +3181,12 @@ public class PythonCodeGenerator extends CodeGenerator {
     /** Generate the token types Java file */
     protected void genTokenTypes(TokenManager tm) throws IOException {
 	// Open the token output Python file and set the currentOutput
-	// stream
+    /**
+     * Generates token types for the given TokenManager.
+     *
+     * @param tm The TokenManager for which token types are generated
+     * @throws IOException If an I/O error occurs while generating token types
+     */
 	// SAS: file open was moved to a method so a subclass can override
 	//      This was mainly for the VAJ interface
 	// setupOutput(tm.getName() + TokenTypesFileSuffix);
@@ -3450,9 +3452,6 @@ public class PythonCodeGenerator extends CodeGenerator {
 	return
 	    "(" + lookaheadString(k) + " >= " + getValueString(begin,true) + " and " +
 	    lookaheadString(k) + " <= " + getValueString(end,true) + ")";
-    }
-
-    /** getValueString: get a string representation of a token or char value
      * @param value The token or char value
      */
     private String getValueString(int value,boolean wrap) {
