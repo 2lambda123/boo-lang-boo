@@ -11,6 +11,7 @@ import antlr.SemanticException;
 import antlr.collections.impl.BitSet;
 import antlr.ASTPair;
 import antlr.collections.impl.ASTArray;
+import io.github.pixee.security.ObjectInputFilters;
 
 import java.util.*;
 import java.io.*;
@@ -436,6 +437,7 @@ public SymtabPhase() {
 			File symTab = new File (PascalParser.translateFilePath , usesSymtab);
 			try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(symTab));
+			ObjectInputFilters.enableObjectFilterIfUnprotected(ois);
 			readSymtab = ois.readObject();
 			ois.close();
 			}
