@@ -384,6 +384,13 @@ public SymtabPhase() {
 		_retTree = _t;
 	}
 	
+	/**
+	 * This method processes the uses units part of the input Abstract Syntax Tree (AST).
+	 * It handles the parsing of uses units and building symbol tables for each uses unit.
+	 *
+	 * @param _t The input Abstract Syntax Tree (AST) node to process
+	 * @throws RecognitionException if an error occurs during parsing
+ 	*/
 	public final void usesUnitsPart(AST _t) throws RecognitionException {
 		
 		PascalAST usesUnitsPart_AST_in = (PascalAST)_t;
