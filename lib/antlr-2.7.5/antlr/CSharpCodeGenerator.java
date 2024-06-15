@@ -970,12 +970,6 @@ public class CSharpCodeGenerator extends CodeGenerator {
         return "tokenSet_" + index + "_";
     }
 
-	/** Generate the finish of a block, using a combination of the info
-	* returned from genCommonBlock() and the action to perform when
-	* no alts were taken
-	* @param howToFinish The return of genCommonBlock()
-	* @param noViableAction What to generate when no alt is taken
-	*/
 	private void genBlockFinish(CSharpBlockFinishingInfo howToFinish, String noViableAction)
 	{
 
@@ -1810,17 +1804,6 @@ public class CSharpCodeGenerator extends CodeGenerator {
 	* error checking before the postfix is generated.  If the
 	* grammar is a lexer, then generate alternatives in an order
 	* where alternatives requiring deeper lookahead are generated
-	* first, and EOF in the lookahead set reduces the depth of
-	* the lookahead.  @param blk The block to generate @param
-	* noTestForSingle If true, then it does not generate a test
-	* for a single alternative.
-	*/
-	public CSharpBlockFinishingInfo genCommonBlock(AlternativeBlock blk,
-		boolean noTestForSingle)
-	{
-		int nIF=0;
-		boolean createdLL1Switch = false;
-		int closingBracesOfIFSequence = 0;
 		CSharpBlockFinishingInfo finishingInfo = new CSharpBlockFinishingInfo();
 		if ( DEBUG_CODE_GENERATOR ) System.out.println("genCommonBlock("+blk+")");
 
@@ -2416,7 +2399,12 @@ public class CSharpCodeGenerator extends CodeGenerator {
 			println("{");
 			tabs++;
 		}
-	}
+				/**
+				 * This method generates an error try block for the given AlternativeElement.
+				 * It checks if the label of the element is null and then proceeds to handle the error.
+				 *
+				 * @param el The AlternativeElement for which the error try block is generated
+ 				*/
 
     protected void genASTDeclaration(AlternativeElement el)
     {
@@ -2793,22 +2781,16 @@ public class CSharpCodeGenerator extends CodeGenerator {
 	 *
 	 * A rule finishes by setting the returnAST variable from the
 	 * ASTPair.
+	/**
+	 * Generates a rule based on the provided RuleSymbol, startSymbol flag, rule number, and TokenManager.
 	 *
-	 * @param rule The name of the rule to generate
-	 * @param startSymbol true if the rule is a start symbol (i.e., not referenced elsewhere)
-	*/
-	public void genRule(RuleSymbol s, boolean startSymbol, int ruleNum, TokenManager tm) {
-		tabs=1;
-		if ( DEBUG_CODE_GENERATOR ) System.out.println("genRule("+ s.getId() +")");
-		if ( !s.isDefined() ) {
-			antlrTool.error("undefined rule: "+ s.getId());
-			return;
-		}
-
-		// Generate rule return type, name, arguments
-		RuleBlock rblk = s.getBlock();
-		currentRule = rblk;
-		currentASTResult = s.getId();
+	 * @param s The RuleSymbol to generate the rule from
+	 * @param startSymbol A boolean flag indicating if the rule is a start symbol
+	 * @param ruleNum The rule number
+	 * @param tm The TokenManager to use
+	 * @throws TokenStreamException If an error occurs with the token stream
+	 * @throws CharStreamException If an error occurs with the character stream
+ 	*/
 
       // clear list of declared ast variables..
       declaredASTVariables.clear();
@@ -3241,6 +3223,12 @@ public class CSharpCodeGenerator extends CodeGenerator {
 			println("int _m" + blk.ID + " = mark();");
 		}
 
+				/**
+				 * Method to generate a syntactic predicate.
+				 *
+				 * @param blk The SynPredBlock to generate
+				 * @param lookaheadExpr The lookahead expression
+ 				*/
 		// Once inside the try, assume synpred works unless exception caught
 		println("synPredMatched" + blk.ID + " = true;");
 		println("inputState.guessing++;");
@@ -3904,10 +3892,18 @@ public class CSharpCodeGenerator extends CodeGenerator {
         // assignment was done to the rule's tree root.
         if (grammar==null)
             return actionStr;
-
-        // see if we have anything to do...
-        if ((grammar.buildAST && actionStr.indexOf('#') != -1) ||
-            grammar instanceof TreeWalkerGrammar ||
+    /**
+     * Processes the action string for special symbols.
+     *
+     * @param actionStr The action string to process.
+     * @param line The line number of the action.
+     * @param currentRule The current rule being processed.
+     * @param tInfo The action translation information.
+     * @return The processed action string or null if the input is empty.
+     * @throws RecognitionException If an error occurs during recognition.
+     * @throws TokenStreamException If an error occurs while processing the token stream.
+     * @throws CharStreamException If an error occurs while processing the character stream.
+     */
             ((grammar instanceof LexerGrammar ||
             grammar instanceof ParserGrammar)
 			  	&& actionStr.indexOf('$') != -1) )
